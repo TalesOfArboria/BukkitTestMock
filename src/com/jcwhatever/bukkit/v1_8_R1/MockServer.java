@@ -1,10 +1,6 @@
 package com.jcwhatever.bukkit.v1_8_R1;
 
 import com.avaje.ebean.config.ServerConfig;
-import com.jcwhatever.bukkit.MockInventory;
-import com.jcwhatever.bukkit.MockPlayer;
-import com.jcwhatever.bukkit.MockPluginManager;
-import com.jcwhatever.bukkit.MockWorld;
 
 import org.bukkit.BanList;
 import org.bukkit.BanList.Type;
@@ -19,10 +15,14 @@ import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftItemFactory;
 import org.bukkit.craftbukkit.v1_8_R1.scheduler.CraftScheduler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.help.HelpMap;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -40,8 +40,11 @@ import org.bukkit.util.CachedServerIcon;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -56,11 +59,130 @@ import java.util.logging.Logger;
 public class MockServer implements Server {
 
     private Thread _homeThread;
-    private final MockPluginManager _pluginManager = new MockPluginManager();
+    private final SimpleCommandMap _commandMap;
+    private final MockPluginManager _pluginManager;
     private final CraftScheduler _scheduler = new CraftScheduler();
+    private final Map<String, MockPlayer> _playerByName = new HashMap<>(5);
+    private final Map<UUID, MockPlayer> _playersById = new HashMap<>(5);
+    private Map<String, World> _worldsByName = new HashMap<>(5);
+    private Map<UUID, World> _worldsById = new HashMap<>(5);
+
+    private int _maxPlayers = 100;
+    private int _port = 2356;
+    private int _viewDistance = 16;
+    private String _ip = "127.0.0.1";
+    private String _serverName = "Dummy";
+    private String _serverId = "Dummy";
+    private String _worldType = "DEFAULT";
+    private boolean _hasGeneratedStructures = true;
+    private GameMode _defaultGameMode = GameMode.SURVIVAL;
 
     public MockServer() {
         _homeThread = Thread.currentThread();
+
+        _commandMap = new SimpleCommandMap(this);
+        _pluginManager = new MockPluginManager(this, _commandMap);
+    }
+
+    /**
+     * Login a mock player and return the {@code MockPlayer}
+     * instance. If the player is already logged in, the current
+     * player is returned.
+     *
+     * @param playerName  The name of the player.
+     */
+    public MockPlayer login(String playerName) {
+        MockPlayer player = _playerByName.get(playerName.toLowerCase());
+        if (player == null) {
+            player = new MockPlayer(playerName);
+            _playerByName.put(playerName.toLowerCase(), player);
+            _playersById.put(player.getUniqueId(), player);
+
+            try {
+                PlayerLoginEvent event = new PlayerLoginEvent(
+                        player, "dummyHost", InetAddress.getLocalHost());
+                _pluginManager.callEvent(event);
+
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return player;
+    }
+
+    /**
+     * Logout a player by name.
+     *
+     * @param playerName  The name of the player to logout.
+     *
+     * @return  True if the player was found and removed.
+     */
+    public boolean logout(String playerName) {
+        return logout(playerName, "Disconnected");
+    }
+
+    /**
+     * Logout a player by name.
+     *
+     * @param playerName  The name of the player to logout.
+     * @param message     The logout message.
+     *
+     * @return  True if the player was found and removed.
+     */
+    public boolean logout(String playerName, String message) {
+
+        MockPlayer player = _playerByName.remove(playerName.toLowerCase());
+        if (player == null)
+            return false;
+
+        _pluginManager.callEvent(new PlayerQuitEvent(player, message));
+
+        return true;
+    }
+
+    /**
+     * Kick a player by name.
+     *
+     * @param playerName  The name of the player to kick.
+     * @param reason      The reason the player is being kicked.
+     * @param message     The message to show the player.
+     *
+     * @return  True if the player was found and kicked.
+     */
+    public boolean kick(String playerName, String reason, String message) {
+
+        MockPlayer player = _playerByName.remove(playerName.toLowerCase());
+        if (player == null)
+            return false;
+
+        _playersById.remove(player.getUniqueId());
+
+        _pluginManager.callEvent(new PlayerKickEvent(player, reason, message));
+
+        _pluginManager.callEvent(new PlayerQuitEvent(player, message));
+
+        return true;
+    }
+
+    /**
+     * Add a world to the server or get an existing one.
+     *
+     * @param name  The name of the world.
+     *
+     * @return  The world.
+     */
+    public MockWorld world(String name) {
+
+        World world = _worldsByName.get(name.toLowerCase());
+        if (world != null)
+            return (MockWorld)world;
+
+        MockWorld mockWorld = new MockWorld(name);
+
+        _worldsByName.put(name.toLowerCase(), mockWorld);
+        _worldsById.put(mockWorld.getUID(), mockWorld);
+        return mockWorld;
     }
 
     @Override
@@ -85,57 +207,148 @@ public class MockServer implements Server {
 
     @Override
     public Collection<? extends Player> getOnlinePlayers() {
-        return new ArrayList<>(0);
+        return new ArrayList<>(_playerByName.values());
     }
 
     @Override
     public int getMaxPlayers() {
-        return 100;
+        return _maxPlayers;
+    }
+
+    /**
+     * Set the max number of players on the server.
+     *
+     * @param max  The max players.
+     */
+    public void setMaxPlayers(int max) {
+        _maxPlayers = max;
     }
 
     @Override
     public int getPort() {
-        return 0;
+        return _port;
+    }
+
+    /**
+     * Set the server port.
+     *
+     * @param port  The port.
+     */
+    public void setPort(int port) {
+        _port = port;
     }
 
     @Override
     public int getViewDistance() {
-        return 16;
+        return _viewDistance;
+    }
+
+    /**
+     * Set the server view distance.
+     *
+     * @param viewDistance  The view distance.
+     */
+    public void setViewDistance(int viewDistance) {
+        _viewDistance = viewDistance;
     }
 
     @Override
     public String getIp() {
-        return null;
+        return _ip;
+    }
+
+    public void setIp(String ip) {
+        _ip = ip;
     }
 
     @Override
     public String getServerName() {
-        return "Dummy";
+        return _serverName;
+    }
+
+    /**
+     * Set the server name.
+     *
+     * @param serverName  The name of the server.
+     */
+    public void setServerName(String serverName) {
+        _serverName = serverName;
     }
 
     @Override
     public String getServerId() {
-        return "Dummy";
+        return _serverId;
+    }
+
+    /**
+     * Set the server Id.
+     *
+     * @param id  The id of the server.
+     */
+    public void setServerId(String id) {
+        _serverId = id;
     }
 
     @Override
     public String getWorldType() {
-        return null;
+        return _worldType;
+    }
+
+    /**
+     * Set the server world type.
+     *
+     * @param worldType  The world type.
+     */
+    public void setWorldType(String worldType) {
+        _worldType = worldType;
     }
 
     @Override
     public boolean getGenerateStructures() {
-        return false;
+        return _hasGeneratedStructures;
     }
+
+    /**
+     * Set flag to determine if structures are generated.
+     *
+     * @param isGenerated  True to generate.
+     */
+    public void setGeneratedStructures(boolean isGenerated) {
+        _hasGeneratedStructures = isGenerated;
+    }
+
+    private boolean _allowEnd;
 
     @Override
     public boolean getAllowEnd() {
-        return false;
+        return _allowEnd;
     }
+
+    /**
+     * Set flag to determine if the End is allowed
+     * for the server.
+     *
+     * @param allow  True to allow
+     */
+    public void setAllowEnd(boolean allow) {
+        _allowEnd = allow;
+    }
+
+    private boolean _allowNether;
 
     @Override
     public boolean getAllowNether() {
-        return false;
+        return _allowNether;
+    }
+
+    /**
+     * Set flag to determine if the Nether is allows
+     * for the server.
+     *
+     * @param allow  True to allow.
+     */
+    public void setAllowNether(boolean allow) {
+        _allowNether = allow;
     }
 
     @Override
@@ -160,7 +373,7 @@ public class MockServer implements Server {
 
     @Override
     public int broadcastMessage(String s) {
-        return 0;
+        return _playerByName.size();
     }
 
     @Override
@@ -190,22 +403,30 @@ public class MockServer implements Server {
 
     @Override
     public Player getPlayer(String s) {
-        return new MockPlayer(s);
+        return _playerByName.get(s.toLowerCase());
     }
 
     @Override
     public Player getPlayerExact(String s) {
-        return new MockPlayer(s);
+        return _playerByName.get(s);
     }
 
     @Override
     public List<Player> matchPlayer(String s) {
-        return null;
+
+        List<Player> result = new ArrayList<>(10);
+
+        for (MockPlayer player : _playerByName.values()) {
+            if (player.getName().contains(s))
+                result.add(player);
+        }
+
+        return result;
     }
 
     @Override
     public Player getPlayer(UUID uuid) {
-        return new MockPlayer("dummy-" + uuid, uuid);
+        return _playersById.get(uuid);
     }
 
     @Override
@@ -225,7 +446,7 @@ public class MockServer implements Server {
 
     @Override
     public List<World> getWorlds() {
-        return null;
+        return new ArrayList<>(_worldsByName.values());
     }
 
     @Override
@@ -245,12 +466,12 @@ public class MockServer implements Server {
 
     @Override
     public World getWorld(String s) {
-        return new MockWorld(s);
+        return _worldsByName.get(s.toLowerCase());
     }
 
     @Override
     public World getWorld(UUID uuid) {
-        return new MockWorld(uuid.toString());
+        return _worldsById.get(uuid);
     }
 
     @Override
@@ -266,6 +487,10 @@ public class MockServer implements Server {
     @Override
     public void reload() {
 
+        _pluginManager.disablePlugins();
+        for (Plugin plugin : _pluginManager.getPlugins()) {
+            _pluginManager.enablePlugin(plugin);
+        }
     }
 
     @Override
@@ -405,12 +630,12 @@ public class MockServer implements Server {
 
     @Override
     public GameMode getDefaultGameMode() {
-        return GameMode.SURVIVAL;
+        return _defaultGameMode;
     }
 
     @Override
     public void setDefaultGameMode(GameMode gameMode) {
-
+        _defaultGameMode = gameMode;
     }
 
     @Override

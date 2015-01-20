@@ -1,4 +1,4 @@
-package com.jcwhatever.bukkit;
+package com.jcwhatever.bukkit.v1_8_R1;
 
 import org.bukkit.Bukkit;
 import org.bukkit.EntityEffect;

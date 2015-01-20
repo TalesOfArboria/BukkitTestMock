@@ -1,9 +1,8 @@
-package com.jcwhatever.bukkit;
-
-import com.jcwhatever.bukkit.v1_8_R1.MockServer;
+package com.jcwhatever.bukkit.v1_8_R1;
 
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_8_R1.scheduler.CraftScheduler;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
@@ -25,6 +24,7 @@ public class BukkitTest {
     private static boolean _isInit;
     private static long _nextHeartBeat;
     private static int _currentTick = 0;
+    private static MockServer _server;
 
     /**
      * Initialize the Bukkit server. This needs to be called
@@ -39,14 +39,26 @@ public class BukkitTest {
 
         _isInit = true;
 
+        if (_server == null)
+            _server = new MockServer();
+
         try {
-            Bukkit.setServer(new MockServer());
+            Bukkit.setServer(_server);
         }
         catch (UnsupportedOperationException ignore) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Get the mock Bukkit server.
+     */
+    public static MockServer getServer() {
+        init();
+
+        return _server;
     }
 
     /**
@@ -82,6 +94,65 @@ public class BukkitTest {
         }
     }
 
+
+    /**
+     * Login a mock player and return the {@code MockPlayer}
+     * instance. If the player is already logged in, the current
+     * player is returned.
+     *
+     * @param playerName  The name of the player.
+     */
+    public static MockPlayer login(String playerName) {
+        return getServer().login(playerName);
+    }
+
+    /**
+     * Logout a player by name.
+     *
+     * @param playerName  The name of the player to logout.
+     *
+     * @return  True if the player was found and removed.
+     */
+    public static boolean logout(String playerName) {
+        return logout(playerName, "Disconnected");
+    }
+
+    /**
+     * Logout a player by name.
+     *
+     * @param playerName  The name of the player to logout.
+     * @param message     The logout message.
+     *
+     * @return  True if the player was found and removed.
+     */
+    public static boolean logout(String playerName, String message) {
+        return getServer().logout(playerName, message);
+    }
+
+    /**
+     * Kick a player by name.
+     *
+     * @param playerName  The name of the player to kick.
+     * @param reason      The reason the player is being kicked.
+     * @param message     The message to show the player.
+     *
+     * @return  True if the player was found and kicked.
+     */
+    public static boolean kick(String playerName, String reason, String message) {
+        return getServer().kick(playerName, reason, message);
+    }
+
+    /**
+     * Add a world to the server or get an existing one.
+     *
+     * @param name  The name of the world.
+     *
+     * @return  The world.
+     */
+    public static MockWorld world(String name) {
+        return getServer().world(name);
+    }
+
     /**
      * Create a new instance of a mock plugin. The plugin
      * returned is already enabled.
@@ -99,8 +170,8 @@ public class BukkitTest {
     /**
      * Instantiate and init a non-mock Bukkit plugin.
      *
-     * <p>The plugin is initialized without commands. The returned instance is already
-     * enabled.</p>
+     * <p>The plugin is initialized without commands. The returned
+     * instance is not yet enabled.</p>
      *
      * @param name         The name to initialize the plugin with.
      * @param version      The version to initialize the plugin with.
@@ -154,17 +225,24 @@ public class BukkitTest {
             throw new RuntimeException(e);
         }
 
-        // enable plugin
-        try {
-            Method method = JavaPlugin.class.getDeclaredMethod("setEnabled", boolean.class);
-            method.setAccessible(true);
-
-            method.invoke(plugin, true);
-
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-
         return plugin;
+    }
+
+    /**
+     * Enable a plugin instance.
+     *
+     * @param plugin  The plugin to enable.
+     */
+    public void enablePlugin(Plugin plugin) {
+        getServer().getPluginManager().enablePlugin(plugin);
+    }
+
+    /**
+     * Disable a plugin instance.
+     *
+     * @param plugin  The plugin to disable.
+     */
+    public void disablePlugin(Plugin plugin) {
+        getServer().getPluginManager().disablePlugin(plugin);
     }
 }

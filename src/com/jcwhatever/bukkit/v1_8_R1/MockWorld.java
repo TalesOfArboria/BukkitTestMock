@@ -1,4 +1,4 @@
-package com.jcwhatever.bukkit;
+package com.jcwhatever.bukkit.v1_8_R1;
 
 import org.bukkit.BlockChangeDelegate;
 import org.bukkit.Chunk;
@@ -48,7 +48,7 @@ public class MockWorld implements World {
     private UUID _uuid;
     private Location _spawnLocation = new Location(this, 0, 0, 0);
 
-    public MockWorld(String name) {
+    MockWorld(String name) {
         _name = name;
         _uuid = _nameIdMap.get(name);
         if (_uuid == null) {
