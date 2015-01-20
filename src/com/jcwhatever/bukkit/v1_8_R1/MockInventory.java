@@ -2,9 +2,9 @@ package com.jcwhatever.bukkit.v1_8_R1;
 
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -18,12 +18,12 @@ import java.util.ListIterator;
  */
 public class MockInventory implements Inventory {
 
-    private InventoryHolder _holder;
+    private Player _holder;
     private InventoryType _type;
     private List<ItemStack> _array;
     private int _maxStackSize = 64;
 
-    public MockInventory(InventoryHolder holder, InventoryType type, int size) {
+    public MockInventory(Player holder, InventoryType type, int size) {
         _holder = holder;
         _type = type;
         _array = new ArrayList<>(size);
@@ -317,7 +317,7 @@ public class MockInventory implements Inventory {
     }
 
     @Override
-    public InventoryHolder getHolder() {
+    public Player getHolder() {
         return _holder;
     }
 

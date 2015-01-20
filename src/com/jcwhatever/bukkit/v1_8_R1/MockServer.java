@@ -665,22 +665,22 @@ public class MockServer implements Server {
 
     @Override
     public Inventory createInventory(InventoryHolder inventoryHolder, InventoryType inventoryType) {
-        return new MockInventory(inventoryHolder, inventoryType, inventoryType.getDefaultSize());
+        return new MockInventory((Player)inventoryHolder, inventoryType, inventoryType.getDefaultSize());
     }
 
     @Override
     public Inventory createInventory(InventoryHolder inventoryHolder, InventoryType inventoryType, String s) {
-        return new MockInventory(inventoryHolder, inventoryType, inventoryType.getDefaultSize());
+        return new MockInventory((Player)inventoryHolder, inventoryType, inventoryType.getDefaultSize());
     }
 
     @Override
     public Inventory createInventory(InventoryHolder inventoryHolder, int i) throws IllegalArgumentException {
-        return new MockInventory(inventoryHolder, InventoryType.CHEST, i);
+        return new MockInventory((Player)inventoryHolder, InventoryType.CHEST, i);
     }
 
     @Override
     public Inventory createInventory(InventoryHolder inventoryHolder, int i, String s) throws IllegalArgumentException {
-        return new MockInventory(inventoryHolder, InventoryType.CHEST, i);
+        return new MockInventory((Player)inventoryHolder, InventoryType.CHEST, i);
     }
 
     @Override

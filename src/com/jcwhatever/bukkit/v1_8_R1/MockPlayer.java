@@ -1,6 +1,7 @@
 package com.jcwhatever.bukkit.v1_8_R1;
 
 import org.bukkit.Achievement;
+import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.EntityEffect;
 import org.bukkit.GameMode;
@@ -24,13 +25,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.InventoryView.Property;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.map.MapView;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.permissions.Permission;
@@ -43,6 +47,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -58,6 +63,11 @@ public class MockPlayer implements Player {
     private String _name;
     private String _displayName;
     private UUID _id;
+    private MockPlayerInventory _inventory;
+    private MockInventoryView _currentView;
+    private MockInventory _enderChest = new MockInventory(this, InventoryType.ENDER_CHEST, 3 * 9);
+    private GameMode _gameMode = GameMode.SURVIVAL;
+    private Location _location = new Location(BukkitTest.world("world"), 0, 11, 0);
 
     public MockPlayer(String name) {
         this(name, UUID.randomUUID());
@@ -67,6 +77,7 @@ public class MockPlayer implements Player {
         _name = name;
         _displayName = name;
         _id = id;
+        _inventory = new MockPlayerInventory(this, InventoryType.CHEST, 4 * 9);
     }
 
     @Override
@@ -506,22 +517,30 @@ public class MockPlayer implements Player {
 
     @Override
     public Location getLocation() {
-        return null;
+        return _location;
     }
 
     @Override
     public Location getLocation(Location location) {
-        return null;
-    }
+        if (location == null)
+            return null;
+        location.setX(location.getX());
+        location.setY(location.getY());
+        location.setZ(location.getZ());
+        location.setYaw(location.getYaw());
+        location.setPitch(location.getPitch());
 
+        return location;
+    }
+    Vector _velocity = new Vector(0, 0, 0);
     @Override
     public void setVelocity(Vector vector) {
-
+        _velocity = vector;
     }
 
     @Override
     public Vector getVelocity() {
-        return null;
+        return _velocity;
     }
 
     @Override
@@ -531,32 +550,39 @@ public class MockPlayer implements Player {
 
     @Override
     public World getWorld() {
-        return null;
+        return _location.getWorld();
     }
 
     @Override
     public boolean teleport(Location location) {
-        return false;
+        return teleport(location, TeleportCause.PLUGIN);
     }
 
     @Override
     public boolean teleport(Location location, TeleportCause teleportCause) {
-        return false;
+
+        PlayerTeleportEvent event = new PlayerTeleportEvent(this, _location, location, teleportCause);
+        if (event.isCancelled())
+            return false;
+
+        _location = event.getTo();
+
+        return true;
     }
 
     @Override
     public boolean teleport(Entity entity) {
-        return false;
+        return teleport(entity.getLocation(), TeleportCause.PLUGIN);
     }
 
     @Override
     public boolean teleport(Entity entity, TeleportCause teleportCause) {
-        return false;
+        return teleport(entity.getLocation(), teleportCause);
     }
 
     @Override
     public List<Entity> getNearbyEntities(double v, double v1, double v2) {
-        return null;
+        return new ArrayList<>(0);
     }
 
     @Override
@@ -596,7 +622,7 @@ public class MockPlayer implements Player {
 
     @Override
     public Server getServer() {
-        return null;
+        return Bukkit.getServer();
     }
 
     @Override
@@ -840,13 +866,13 @@ public class MockPlayer implements Player {
     }
 
     @Override
-    public PlayerInventory getInventory() {
-        return null;
+    public MockPlayerInventory getInventory() {
+        return _inventory;
     }
 
     @Override
-    public Inventory getEnderChest() {
-        return null;
+    public MockInventory getEnderChest() {
+        return _enderChest;
     }
 
     @Override
@@ -855,47 +881,71 @@ public class MockPlayer implements Player {
     }
 
     @Override
-    public InventoryView getOpenInventory() {
-        return null;
+    public MockInventoryView getOpenInventory() {
+        return _currentView;
     }
 
     @Override
-    public InventoryView openInventory(Inventory inventory) {
-        return null;
+    public MockInventoryView openInventory(Inventory inventory) {
+
+        openInventory(new MockInventoryView(this, inventory));
+
+        return _currentView;
     }
 
     @Override
-    public InventoryView openWorkbench(Location location, boolean b) {
-        return null;
+    public MockInventoryView openWorkbench(Location location, boolean b) {
+        Inventory inventory = new MockInventory(this, InventoryType.WORKBENCH, 9);
+        openInventory(new MockInventoryView(this, inventory));
+        return _currentView;
     }
 
     @Override
-    public InventoryView openEnchanting(Location location, boolean b) {
-        return null;
+    public MockInventoryView openEnchanting(Location location, boolean b) {
+        Inventory inventory = new MockInventory(this, InventoryType.ENCHANTING, 2);
+        openInventory(new MockInventoryView(this, inventory));
+        return _currentView;
     }
 
     @Override
     public void openInventory(InventoryView inventoryView) {
 
+        InventoryOpenEvent event = new InventoryOpenEvent(inventoryView);
+        if (event.isCancelled())
+            return;
+
+        Bukkit.getPluginManager().callEvent(event);
+
+        _currentView = (MockInventoryView)inventoryView;
     }
 
     @Override
     public void closeInventory() {
 
+        if (_currentView == null)
+            return;
+
+        InventoryCloseEvent event = new InventoryCloseEvent(_currentView);
+        Bukkit.getPluginManager().callEvent(event);
+
+        _currentView = null;
     }
 
     @Override
     public ItemStack getItemInHand() {
-        return null;
+        return _inventory.getItemInHand();
     }
 
     @Override
     public void setItemInHand(ItemStack itemStack) {
-
+        _inventory.setItemInHand(itemStack);
     }
 
     @Override
     public ItemStack getItemOnCursor() {
+        if (_currentView == null)
+            return null;
+
         return null;
     }
 
@@ -916,12 +966,12 @@ public class MockPlayer implements Player {
 
     @Override
     public GameMode getGameMode() {
-        return GameMode.SURVIVAL;
+        return _gameMode;
     }
 
     @Override
     public void setGameMode(GameMode gameMode) {
-
+        _gameMode = gameMode;
     }
 
     @Override
