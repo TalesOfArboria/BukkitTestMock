@@ -3,14 +3,13 @@ package com.jcwhatever.bukkit;
 import com.jcwhatever.bukkit.v1_8_R1.MockServer;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Server;
 import org.bukkit.craftbukkit.v1_8_R1.scheduler.CraftScheduler;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -137,22 +136,21 @@ public class BukkitTest {
 
         // instantiate plugin
         try {
-            plugin = pluginClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
 
-        // init plugin
-        try {
-            Method method = JavaPlugin.class.getDeclaredMethod("init", PluginLoader.class, Server.class,
-                    PluginDescriptionFile.class, File.class, File.class, ClassLoader.class);
-            method.setAccessible(true);
+            Constructor<T> constructor = pluginClass.getDeclaredConstructor(
+                    JavaPluginLoader.class, PluginDescriptionFile.class, File.class, File.class);
+            constructor.setAccessible(true);
 
-            method.invoke(plugin, new JavaPluginLoader(Bukkit.getServer()), Bukkit.getServer(),
-                    descriptionFile, new File(""), new File(""), BukkitTest.class.getClassLoader());
+            plugin = constructor.newInstance(new JavaPluginLoader(Bukkit.getServer()),
+                    descriptionFile, new File(""), new File(""));
 
+            try {
+                plugin = pluginClass.newInstance();
+            }
+            catch (IllegalStateException ignore) {}
 
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException |
+                NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
 
