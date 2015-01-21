@@ -2,6 +2,11 @@ package com.jcwhatever.bukkit.v1_8_R1;
 
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_8_R1.scheduler.CraftScheduler;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryType.SlotType;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -233,7 +238,7 @@ public class BukkitTest {
      *
      * @param plugin  The plugin to enable.
      */
-    public void enablePlugin(Plugin plugin) {
+    public static void enablePlugin(Plugin plugin) {
         getServer().getPluginManager().enablePlugin(plugin);
     }
 
@@ -242,7 +247,36 @@ public class BukkitTest {
      *
      * @param plugin  The plugin to disable.
      */
-    public void disablePlugin(Plugin plugin) {
+    public static void disablePlugin(Plugin plugin) {
         getServer().getPluginManager().disablePlugin(plugin);
+    }
+
+    /**
+     * Simulate a click on a slot in the players current inventory view.
+     *
+     * @param player        The player to simulate a click for.
+     * @param type          The slot type.
+     * @param rawSlotIndex  The raw slot index of the click.
+     * @param clickType     The click type.
+     * @param action        The inventory action.
+     */
+    public static void viewClick(Player player, SlotType type, int rawSlotIndex,
+                                 ClickType clickType, InventoryAction action) {
+
+        InventoryView view = player.getOpenInventory();
+        if (view == null)
+            throw new AssertionError("Cannot click inventory view because the player " +
+                    "does not have an open inventory view.");
+
+
+        if (!(view instanceof MockInventoryView))
+            throw new AssertionError("Cannot click inventory view because its not an " +
+                    "instance of MockInventoryView.");
+
+        MockInventoryView mockView = (MockInventoryView)view;
+
+        mockView.click(type, rawSlotIndex, clickType, action);
+
+        pause(1);
     }
 }

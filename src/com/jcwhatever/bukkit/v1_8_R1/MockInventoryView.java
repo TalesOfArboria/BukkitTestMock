@@ -34,6 +34,14 @@ public class MockInventoryView extends InventoryView {
         _bottomInventory = player.getInventory();
     }
 
+    /**
+     * Simulate a click on a slot in the inventory view.
+     *
+     * @param type          The slot type.
+     * @param rawSlotIndex  The raw slot index of the click.
+     * @param clickType     The click type.
+     * @param action        The inventory action.
+     */
     public void click(SlotType type, int rawSlotIndex, ClickType clickType, InventoryAction action) {
 
         InventoryClickEvent event = new InventoryClickEvent(this, type, rawSlotIndex, clickType, action);
