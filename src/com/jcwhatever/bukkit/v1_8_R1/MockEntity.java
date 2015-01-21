@@ -17,21 +17,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/*
- * 
+/**
+ * A mock implementation of an {@link Entity}.
  */
 public class MockEntity implements Entity {
 
-    private final EntityType _type;
     private final UUID _uuid;
+    private final int _id;
+    private final EntityType _type;
     private Location _location = new Location(new MockWorld("dummy"), 0, 0, 0);
     private Vector _velocity = new Vector(0, 0, 0);
     private Entity _passenger;
     private String _customName;
     private boolean _isCustomNameVisible;
+    private boolean isDead = false;
 
-
-    public MockEntity(EntityType type) {
+    /**
+     * Constructor.
+     *
+     * @param type  The entity type.
+     */
+    public MockEntity(int id, EntityType type) {
+        _id = id;
         _type = type;
         _uuid = UUID.randomUUID();
     }
@@ -73,7 +80,7 @@ public class MockEntity implements Entity {
 
     @Override
     public boolean teleport(Location location, TeleportCause teleportCause) {
-        this._location = new Location(location.getWorld(),
+        _location = new Location(location.getWorld(),
                 location.getX(), location.getY(), location.getZ(),
                 location.getYaw(), location.getPitch());
         return true;
@@ -96,7 +103,7 @@ public class MockEntity implements Entity {
 
     @Override
     public int getEntityId() {
-        return 0;
+        return _id;
     }
 
     @Override
@@ -113,8 +120,6 @@ public class MockEntity implements Entity {
     public void setFireTicks(int i) {
 
     }
-
-    boolean isDead = false;
 
     @Override
     public void remove() {

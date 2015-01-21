@@ -76,7 +76,20 @@ public class MockServer implements Server {
     private String _worldType = "DEFAULT";
     private boolean _hasGeneratedStructures = true;
     private GameMode _defaultGameMode = GameMode.SURVIVAL;
+    private int _spawnRadius = 5;
+    private boolean _onlineMode;
+    private boolean _allowFlight;
+    private boolean _isHardcore;
+    private boolean _useExactLoginLocation;
+    private int _monsterSpawnLimit = 20;
+    private int _animalSpawnLimit = 20;
+    private int _waterAnimalSpawnLimit = 20;
+    private int _ambientSpawnLimit = 20;
+    private int _idleTimeOut;
 
+    /**
+     * Constructor.
+     */
     public MockServer() {
         _homeThread = Thread.currentThread();
 
@@ -135,6 +148,8 @@ public class MockServer implements Server {
         MockPlayer player = _playerByName.remove(playerName.toLowerCase());
         if (player == null)
             return false;
+
+        _playersById.remove(player.getUniqueId());
 
         _pluginManager.callEvent(new PlayerQuitEvent(player, message));
 
@@ -550,42 +565,87 @@ public class MockServer implements Server {
 
     @Override
     public int getSpawnRadius() {
-        return 0;
+        return _spawnRadius;
     }
 
     @Override
-    public void setSpawnRadius(int i) {
-
+    public void setSpawnRadius(int blocks) {
+        _spawnRadius = blocks;
     }
 
     @Override
     public boolean getOnlineMode() {
-        return false;
+        return _onlineMode;
+    }
+
+    /**
+     * Set the servers online mode.
+     *
+     * @param isOnline  True for online, false for offline.
+     */
+    public void setOnlineMode(boolean isOnline) {
+        _onlineMode = isOnline;
     }
 
     @Override
     public boolean getAllowFlight() {
-        return false;
+        return _allowFlight;
+    }
+
+    /**
+     * Set the servers allow flight policy.
+     *
+     * @param allowFlight  True to allow, false to deny.
+     */
+    public void setAllowFlight(boolean allowFlight) {
+        _allowFlight = allowFlight;
     }
 
     @Override
     public boolean isHardcore() {
-        return false;
+        return _isHardcore;
+    }
+
+    /**
+     * Set the server hardcore mode.
+     *
+     * @param isHardcore  True for hardcore, false for normal.
+     */
+    public void setIsHardcore(boolean isHardcore) {
+        _isHardcore = isHardcore;
     }
 
     @Override
     public boolean useExactLoginLocation() {
-        return false;
+        return _useExactLoginLocation;
+    }
+
+    /**
+     * Set use the exact login location.
+     *
+     * @param useExact  True to use exact
+     */
+    public void setUseExactLoginLocation(boolean useExact) {
+        _useExactLoginLocation = useExact;
     }
 
     @Override
     public void shutdown() {
-
+        System.out.println("The server is shutting down.");
     }
 
     @Override
-    public int broadcast(String s, String s1) {
-        return 0;
+    public int broadcast(String message, String permission) {
+        Collection<? extends Player> players = getOnlinePlayers();
+        int count = 0;
+        for (Player p : players) {
+            if (p.hasPermission(permission)) {
+                p.sendRawMessage(message);
+                count++;
+            }
+        }
+
+        return count;
     }
 
     @Override
@@ -600,7 +660,7 @@ public class MockServer implements Server {
 
     @Override
     public Set<String> getIPBans() {
-        return null;
+        return new HashSet<>(0);
     }
 
     @Override
@@ -615,7 +675,7 @@ public class MockServer implements Server {
 
     @Override
     public Set<OfflinePlayer> getBannedPlayers() {
-        return null;
+        return new HashSet<>(0);
     }
 
     @Override
@@ -625,7 +685,7 @@ public class MockServer implements Server {
 
     @Override
     public Set<OfflinePlayer> getOperators() {
-        return null;
+        return new HashSet<>(0);
     }
 
     @Override
@@ -685,22 +745,58 @@ public class MockServer implements Server {
 
     @Override
     public int getMonsterSpawnLimit() {
-        return 0;
+        return _monsterSpawnLimit;
+    }
+
+    /**
+     * Set the servers monster spawn limit.
+     *
+     * @param limit  The limit.
+     */
+    public void setMonsterSpawnLimit(int limit) {
+        _monsterSpawnLimit = limit;
     }
 
     @Override
     public int getAnimalSpawnLimit() {
-        return 0;
+        return _animalSpawnLimit;
+    }
+
+    /**
+     * Set the servers animal spawn limit.
+     *
+     * @param limit  The limit.
+     */
+    public void setAnimalSpawnLimit(int limit) {
+        _animalSpawnLimit = limit;
     }
 
     @Override
     public int getWaterAnimalSpawnLimit() {
-        return 0;
+        return _waterAnimalSpawnLimit;
+    }
+
+    /**
+     * Set the servers water animal spawn limit.
+     *
+     * @param limit  The limit.
+     */
+    public void setWaterAnimalSpawnLimit(int limit) {
+        _waterAnimalSpawnLimit = limit;
     }
 
     @Override
     public int getAmbientSpawnLimit() {
-        return 0;
+        return _ambientSpawnLimit;
+    }
+
+    /**
+     * Set the servers ambient spawn limit.
+     *
+     * @param limit  The limit.
+     */
+    public void setAmbientSpawnLimit(int limit) {
+        _ambientSpawnLimit = limit;
     }
 
     @Override
@@ -749,13 +845,13 @@ public class MockServer implements Server {
     }
 
     @Override
-    public void setIdleTimeout(int i) {
-
+    public void setIdleTimeout(int minutes) {
+        _idleTimeOut = minutes;
     }
 
     @Override
     public int getIdleTimeout() {
-        return 0;
+        return _idleTimeOut;
     }
 
     @Override

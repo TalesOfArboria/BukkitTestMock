@@ -32,11 +32,21 @@ public class MockPluginManager implements PluginManager {
     private Map<String, Plugin> _plugins = new HashMap<>(10);
     private SimplePluginManager _pluginManager;
 
-
+    /**
+     * Constructor.
+     *
+     * @param server      The current Bukkit server.
+     * @param commandMap  A command map.
+     */
     public MockPluginManager(Server server, SimpleCommandMap commandMap) {
         _pluginManager = new SimplePluginManager(server, commandMap);
     }
 
+    /**
+     * Register a plugin with the plugin manager.
+     *
+     * @param plugin  The plugin to register.
+     */
     public void registerPlugin(Plugin plugin) {
         _plugins.put(plugin.getName().toLowerCase(), plugin);
     }

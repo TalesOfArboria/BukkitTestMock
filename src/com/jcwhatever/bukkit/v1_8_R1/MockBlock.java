@@ -27,6 +27,15 @@ public class MockBlock implements Block {
     private int _y;
     private int _z;
 
+    /**
+     * Constructor.
+     *
+     * @param world     The world the block is in.
+     * @param material  The block material.
+     * @param x         The x coordinates.
+     * @param y         The y coordinates.
+     * @param z         The z coordinates.
+     */
     public MockBlock(World world, Material material, int x, int y, int z) {
         _world = world;
         _material = material;

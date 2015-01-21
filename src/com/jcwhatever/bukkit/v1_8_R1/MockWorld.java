@@ -30,6 +30,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +48,37 @@ public class MockWorld implements World {
     private final String _name;
     private UUID _uuid;
     private Location _spawnLocation = new Location(this, 0, 0, 0);
+    private Map<String, Chunk> _chunks = new HashMap<>(5);
+    private Map<String, Chunk> _loadedChunks = new HashMap<>(5);
+    private long _time;
+    private long _fullTime;
+    private boolean _hasStorm;
+    private int _weatherDuration;
+    private boolean _isThundering;
+    private int _thunderDuration;
+    private Environment _environment = Environment.NORMAL;
+    private long _seed;
+    private boolean _isPvp;
+    private boolean _allowAnimals;
+    private boolean _allowMonsters;
+    private Map<String, Biome> _biomes = new HashMap<>(35);
+    private boolean _keepSpawnInMemory;
+    private boolean _isAutoSave = true;
+    private Difficulty _difficulty = Difficulty.NORMAL;
+    private WorldType _worldType = WorldType.FLAT;
+    private boolean _canGenerateStructures;
+    private long _ticksPerAnimalSpawn = 20;
+    private long _ticksPerMonsterSpawn = 20;
+    private int _monsterSpawnLimit = 20;
+    private int _animalSpawnLimit = 20;
+    private int _waterAnimalSpawnLimit = 20;
+    private int _ambientSpawnLimit = 20;
 
+    /**
+     * Constructor.
+     *
+     * @param name  The name of the world.
+     */
     MockWorld(String name) {
         _name = name;
         _uuid = _nameIdMap.get(name);
@@ -108,94 +139,126 @@ public class MockWorld implements World {
         return new MockBlock(this, Material.STONE, location.getBlockX(), 10, location.getBlockZ());
     }
 
+    private String getCoordKey(int x, int z) {
+        return String.valueOf(x) + '.' + z;
+    }
+
     @Override
     public Chunk getChunkAt(int x, int z) {
-        return null;
+        String key = getCoordKey(x, z);
+        Chunk chunk = _chunks.get(key);
+        if (chunk == null) {
+            chunk = new MockChunk(this, x, z);
+            _chunks.put(key, chunk);
+        }
+
+        return chunk;
     }
 
     @Override
     public Chunk getChunkAt(Location location) {
-        return null;
+
+        if (!this.equals(location.getWorld()))
+            throw new AssertionError("Location is not from the same world.");
+
+        int x = (int)Math.floor(location.getX() / 16.0D);
+        int z = (int)Math.floor(location.getZ() / 16.0D);
+
+        return getChunkAt(x, z);
     }
 
     @Override
     public Chunk getChunkAt(Block block) {
-        return null;
+
+        if (!this.equals(block.getLocation().getWorld()))
+            throw new AssertionError("Block is not from the same world.");
+
+        return getChunkAt(block.getLocation());
     }
 
     @Override
     public boolean isChunkLoaded(Chunk chunk) {
-        return false;
+
+        if (!this.equals(chunk.getWorld()))
+            throw new AssertionError("Chunk is not from the same world.");
+
+        return _loadedChunks.containsKey(getCoordKey(chunk.getX(), chunk.getZ()));
     }
 
     @Override
     public Chunk[] getLoadedChunks() {
-        return new Chunk[0];
+        return _loadedChunks.values().toArray(new Chunk[_loadedChunks.size()]);
     }
 
     @Override
     public void loadChunk(Chunk chunk) {
 
+        if (!this.equals(chunk.getWorld()))
+            throw new AssertionError("Chunk is not from the same world.");
+
+        loadChunk(chunk.getX(), chunk.getZ());
     }
 
     @Override
-    public boolean isChunkLoaded(int i, int i1) {
+    public boolean isChunkLoaded(int x, int z) {
+        return _loadedChunks.containsKey(getCoordKey(x, z));
+    }
+
+    @Override
+    public boolean isChunkInUse(int x, int z) {
         return false;
     }
 
     @Override
-    public boolean isChunkInUse(int i, int i1) {
-        return false;
+    public void loadChunk(int x, int z) {
+        Chunk mockChunk = getChunkAt(x, z);
+        _loadedChunks.put(getCoordKey(x, z), mockChunk);
     }
 
     @Override
-    public void loadChunk(int i, int i1) {
-
-    }
-
-    @Override
-    public boolean loadChunk(int i, int i1, boolean b) {
-        return false;
+    public boolean loadChunk(int x, int z, boolean generate) {
+        loadChunk(x, z);
+        return true;
     }
 
     @Override
     public boolean unloadChunk(Chunk chunk) {
-        return false;
+        return unloadChunk(chunk.getX(), chunk.getZ());
     }
 
     @Override
-    public boolean unloadChunk(int i, int i1) {
-        return false;
+    public boolean unloadChunk(int x, int z) {
+        return _loadedChunks.remove(getCoordKey(x, z)) != null;
     }
 
     @Override
-    public boolean unloadChunk(int i, int i1, boolean b) {
-        return false;
+    public boolean unloadChunk(int x, int z, boolean safe) {
+        return unloadChunk(x, z);
     }
 
     @Override
-    public boolean unloadChunk(int i, int i1, boolean b, boolean b1) {
-        return false;
+    public boolean unloadChunk(int x, int z, boolean save, boolean safe) {
+        return unloadChunk(x, z);
     }
 
     @Override
-    public boolean unloadChunkRequest(int i, int i1) {
-        return false;
+    public boolean unloadChunkRequest(int x, int z) {
+        return unloadChunk(x, z);
     }
 
     @Override
-    public boolean unloadChunkRequest(int i, int i1, boolean b) {
-        return false;
+    public boolean unloadChunkRequest(int x, int z, boolean safe) {
+        return unloadChunk(x, z);
     }
 
     @Override
-    public boolean regenerateChunk(int i, int i1) {
-        return false;
+    public boolean regenerateChunk(int x, int z) {
+        return true;
     }
 
     @Override
-    public boolean refreshChunk(int i, int i1) {
-        return false;
+    public boolean refreshChunk(int x, int z) {
+        return true;
     }
 
     @Override
@@ -301,107 +364,125 @@ public class MockWorld implements World {
 
     @Override
     public long getTime() {
-        return 0;
+        return _time;
     }
 
     @Override
     public void setTime(long l) {
-
+        _time = l;
     }
 
     @Override
     public long getFullTime() {
-        return 0;
+        return _fullTime;
     }
 
     @Override
     public void setFullTime(long l) {
-
+        _fullTime = l;
     }
 
     @Override
     public boolean hasStorm() {
-        return false;
+        return _hasStorm;
     }
 
     @Override
-    public void setStorm(boolean b) {
-
+    public void setStorm(boolean hasStorm) {
+        _hasStorm = hasStorm;
     }
 
     @Override
     public int getWeatherDuration() {
-        return 0;
+        return _weatherDuration;
     }
 
     @Override
     public void setWeatherDuration(int i) {
-
+        _weatherDuration = i;
     }
 
     @Override
     public boolean isThundering() {
-        return false;
+        return _isThundering;
     }
 
     @Override
-    public void setThundering(boolean b) {
-
+    public void setThundering(boolean isThundering) {
+        _isThundering = isThundering;
     }
 
     @Override
     public int getThunderDuration() {
-        return 0;
+        return _thunderDuration;
     }
 
     @Override
-    public void setThunderDuration(int i) {
-
+    public void setThunderDuration(int duration) {
+        _thunderDuration = duration;
     }
 
     @Override
     public boolean createExplosion(double v, double v1, double v2, float v3) {
-        return false;
+        return true;
     }
 
     @Override
     public boolean createExplosion(double v, double v1, double v2, float v3, boolean b) {
-        return false;
+        return true;
     }
 
     @Override
     public boolean createExplosion(double v, double v1, double v2, float v3, boolean b, boolean b1) {
-        return false;
+        return true;
     }
 
     @Override
     public boolean createExplosion(Location location, float v) {
-        return false;
+        return true;
     }
 
     @Override
     public boolean createExplosion(Location location, float v, boolean b) {
-        return false;
+        return true;
     }
 
     @Override
     public Environment getEnvironment() {
-        return null;
+        return _environment;
+    }
+
+    /**
+     * Set the world environment.
+     *
+     * @param environment  The environment.
+     */
+    public void setEnvironment(Environment environment) {
+        _environment = environment;
     }
 
     @Override
     public long getSeed() {
-        return 0;
+        return _seed;
+    }
+
+    /**
+     * Set the world seed.
+     *
+     * @param seed  The seed.
+     */
+    public void setSeed(long seed) {
+        _seed = seed;
     }
 
     @Override
     public boolean getPVP() {
-        return false;
+        return _isPvp;
     }
 
     @Override
     public void setPVP(boolean b) {
-
+        _isPvp = b;
     }
 
     @Override
@@ -416,7 +497,7 @@ public class MockWorld implements World {
 
     @Override
     public List<BlockPopulator> getPopulators() {
-        return null;
+        return new ArrayList<>(0);
     }
 
     @Override
@@ -466,22 +547,41 @@ public class MockWorld implements World {
 
     @Override
     public boolean getAllowAnimals() {
-        return false;
+        return _allowAnimals;
+    }
+
+    /**
+     * Set animals allowed in world.
+     *
+     * @param allow  True to allow.
+     */
+    public void setAllowAnimals(boolean allow) {
+        _allowAnimals = allow;
     }
 
     @Override
     public boolean getAllowMonsters() {
-        return false;
+        return _allowMonsters;
+    }
+
+    /**
+     * Set monsters allowed in world.
+     *
+     * @param allow  True to allow.
+     */
+    public void setAllowMonsters(boolean allow) {
+        _allowMonsters = allow;
     }
 
     @Override
-    public Biome getBiome(int i, int i1) {
-        return null;
+    public Biome getBiome(int x, int z) {
+        Biome biome = _biomes.get(getCoordKey(x, z));
+        return biome != null ? biome : Biome.PLAINS;
     }
 
     @Override
-    public void setBiome(int i, int i1, Biome biome) {
-
+    public void setBiome(int x, int z, Biome biome) {
+        _biomes.put(getCoordKey(x, z), biome);
     }
 
     @Override
@@ -496,42 +596,46 @@ public class MockWorld implements World {
 
     @Override
     public int getMaxHeight() {
-        return 0;
+        return 255;
     }
 
     @Override
     public int getSeaLevel() {
-        return 0;
+        return 10;
     }
 
     @Override
     public boolean getKeepSpawnInMemory() {
-        return false;
+        return _keepSpawnInMemory;
     }
 
     @Override
     public void setKeepSpawnInMemory(boolean b) {
-
+        _keepSpawnInMemory = b;
     }
 
     @Override
     public boolean isAutoSave() {
-        return false;
+        return _isAutoSave;
     }
 
     @Override
     public void setAutoSave(boolean b) {
-
+        _isAutoSave = b;
     }
 
     @Override
     public void setDifficulty(Difficulty difficulty) {
 
+        if (difficulty == null)
+            throw new AssertionError("Difficulty cannot be null");
+
+        _difficulty = difficulty;
     }
 
     @Override
     public Difficulty getDifficulty() {
-        return null;
+        return _difficulty;
     }
 
     @Override
@@ -541,72 +645,90 @@ public class MockWorld implements World {
 
     @Override
     public WorldType getWorldType() {
-        return null;
+        return _worldType;
+    }
+
+    /**
+     * Set the world type.
+     *
+     * @param worldType  The world type.
+     */
+    public void setWorldType(WorldType worldType) {
+        _worldType = worldType;
     }
 
     @Override
     public boolean canGenerateStructures() {
-        return false;
+        return _canGenerateStructures;
+    }
+
+    /**
+     * Set world structure generation.
+     *
+     * @param canGenerate  True to allow structure generation.
+     */
+    public void setCanGenerateStructures(boolean canGenerate) {
+        _canGenerateStructures = canGenerate;
     }
 
     @Override
     public long getTicksPerAnimalSpawns() {
-        return 0;
+        return _ticksPerAnimalSpawn;
     }
 
     @Override
-    public void setTicksPerAnimalSpawns(int i) {
-
+    public void setTicksPerAnimalSpawns(int ticks) {
+        _ticksPerAnimalSpawn = ticks;
     }
 
     @Override
     public long getTicksPerMonsterSpawns() {
-        return 0;
+        return _ticksPerMonsterSpawn;
     }
 
     @Override
-    public void setTicksPerMonsterSpawns(int i) {
-
+    public void setTicksPerMonsterSpawns(int ticks) {
+        _ticksPerMonsterSpawn = ticks;
     }
 
     @Override
     public int getMonsterSpawnLimit() {
-        return 0;
+        return _monsterSpawnLimit;
     }
 
     @Override
-    public void setMonsterSpawnLimit(int i) {
-
+    public void setMonsterSpawnLimit(int limit) {
+        _monsterSpawnLimit = limit;
     }
 
     @Override
     public int getAnimalSpawnLimit() {
-        return 0;
+        return _animalSpawnLimit;
     }
 
     @Override
-    public void setAnimalSpawnLimit(int i) {
-
+    public void setAnimalSpawnLimit(int limit) {
+        _animalSpawnLimit = limit;
     }
 
     @Override
     public int getWaterAnimalSpawnLimit() {
-        return 0;
+        return _waterAnimalSpawnLimit;
     }
 
     @Override
-    public void setWaterAnimalSpawnLimit(int i) {
-
+    public void setWaterAnimalSpawnLimit(int limit) {
+        _waterAnimalSpawnLimit = limit;
     }
 
     @Override
     public int getAmbientSpawnLimit() {
-        return 0;
+        return _ambientSpawnLimit;
     }
 
     @Override
-    public void setAmbientSpawnLimit(int i) {
-
+    public void setAmbientSpawnLimit(int limit) {
+        _ambientSpawnLimit = limit;
     }
 
     @Override

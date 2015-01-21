@@ -23,6 +23,13 @@ public class MockInventory implements Inventory {
     private List<ItemStack> _array;
     private int _maxStackSize = 64;
 
+    /**
+     * Constructor.
+     *
+     * @param holder  The inventory owner.
+     * @param type    The inventory type.
+     * @param size    The inventory size.
+     */
     public MockInventory(Player holder, InventoryType type, int size) {
         _holder = holder;
         _type = type;

@@ -22,12 +22,25 @@ public class MockInventoryView extends InventoryView {
     private Inventory _bottomInventory;
     private ItemStack _cursor;
 
+    /**
+     * Constructor.
+     *
+     * <p>The top inventory is a full 6 x 9 chest inventory.</p>
+     *
+     * @param player  The player viewer.
+     */
     public MockInventoryView(Player player) {
         _player = player;
         _topInventory = new MockInventory(player, InventoryType.CHEST, 6 * 9);
         _bottomInventory = player.getInventory();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param player        The player viewer.
+     * @param topInventory  The top inventory.
+     */
     public MockInventoryView(Player player, Inventory topInventory) {
         _player = player;
         _topInventory = topInventory;

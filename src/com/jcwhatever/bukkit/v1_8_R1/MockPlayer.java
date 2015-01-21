@@ -68,11 +68,29 @@ public class MockPlayer implements Player {
     private MockInventory _enderChest = new MockInventory(this, InventoryType.ENDER_CHEST, 3 * 9);
     private GameMode _gameMode = GameMode.SURVIVAL;
     private Location _location = new Location(BukkitTest.world("world"), 0, 11, 0);
+    private boolean _canPickupItems = true;
+    private double _maxHealth = 20;
+    private double _health = 20;
+    private boolean _isOp;
+    private Location _compassTarget = new Location(BukkitTest.world("world"), 0, 0, 0);
 
+    /**
+     * Constructor.
+     *
+     * <p>The player is assigned a random UUID.</p>
+     *
+     * @param name  The name of the player.
+     */
     public MockPlayer(String name) {
         this(name, UUID.randomUUID());
     }
 
+    /**
+     * Constructor.
+     *
+     * @param name  The name of the player.
+     * @param id    The players unique id.
+     */
     public MockPlayer(String name, UUID id) {
         _name = name;
         _displayName = name;
@@ -102,12 +120,12 @@ public class MockPlayer implements Player {
 
     @Override
     public void setCompassTarget(Location location) {
-
+        _compassTarget = location;
     }
 
     @Override
     public Location getCompassTarget() {
-        return null;
+        return _compassTarget;
     }
 
     @Override
@@ -951,7 +969,7 @@ public class MockPlayer implements Player {
 
     @Override
     public void setItemOnCursor(ItemStack itemStack) {
-
+        _currentView.setCursor(itemStack);
     }
 
     @Override
@@ -1146,12 +1164,12 @@ public class MockPlayer implements Player {
 
     @Override
     public void setCanPickupItems(boolean b) {
-
+        _canPickupItems = b;
     }
 
     @Override
     public boolean getCanPickupItems() {
-        return false;
+        return _canPickupItems;
     }
 
     @Override
@@ -1171,67 +1189,67 @@ public class MockPlayer implements Player {
 
     @Override
     public void damage(double v) {
-
+        _health -= v;
     }
 
     @Override
     public void _INVALID_damage(int i) {
-
+        _health -= i;
     }
 
     @Override
     public void damage(double v, Entity entity) {
-
+        _health -= v;
     }
 
     @Override
     public void _INVALID_damage(int i, Entity entity) {
-
+        _health -= i;
     }
 
     @Override
     public double getHealth() {
-        return 20;
+        return _health;
     }
 
     @Override
     public int _INVALID_getHealth() {
-        return 0;
+        return (int)_health;
     }
 
     @Override
     public void setHealth(double v) {
-
+        _health = v;
     }
 
     @Override
     public void _INVALID_setHealth(int i) {
-
+        _health = i;
     }
 
     @Override
     public double getMaxHealth() {
-        return 20;
+        return _maxHealth;
     }
 
     @Override
     public int _INVALID_getMaxHealth() {
-        return 0;
+        return (int)_maxHealth;
     }
 
     @Override
     public void setMaxHealth(double v) {
-
+        _maxHealth = v;
     }
 
     @Override
     public void _INVALID_setMaxHealth(int i) {
-
+        _maxHealth = i;
     }
 
     @Override
     public void resetMaxHealth() {
-
+        _maxHealth = 20;
     }
 
     @Override
@@ -1331,11 +1349,11 @@ public class MockPlayer implements Player {
 
     @Override
     public boolean isOp() {
-        return false;
+        return _isOp;
     }
 
     @Override
     public void setOp(boolean b) {
-
+        _isOp = b;
     }
 }

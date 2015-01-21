@@ -13,6 +13,13 @@ public class MockPlayerInventory extends MockInventory implements PlayerInventor
     private ItemStack[] _armor = new ItemStack[4];
     private int _heldItemSlot;
 
+    /**
+     * Constructor.
+     *
+     * @param holder  The inventory owner.
+     * @param type    The inventory type.
+     * @param size    The inventory size.
+     */
     public MockPlayerInventory(Player holder, InventoryType type, int size) {
         super(holder, type, size);
     }

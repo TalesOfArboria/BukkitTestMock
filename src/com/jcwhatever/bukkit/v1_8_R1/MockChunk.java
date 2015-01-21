@@ -8,8 +8,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 
-/*
- * 
+/**
+ * Mock implementation of a chunk.
  */
 public class MockChunk implements Chunk {
 
@@ -17,6 +17,13 @@ public class MockChunk implements Chunk {
     private int _x;
     private int _z;
 
+    /**
+     * Constructor.
+     *
+     * @param world  The world the chunk is in.
+     * @param x      The chunk x coordinates.
+     * @param z      The chunk z coordinates.
+     */
     public MockChunk(World world, int x, int z) {
         _world = world;
         _x = x;
@@ -40,7 +47,7 @@ public class MockChunk implements Chunk {
 
     @Override
     public Block getBlock(int x, int y, int z) {
-        return new MockBlock(_world, Material.AIR, _x + x, y, _z + z);
+        return new MockBlock(_world, y <= 10 ? Material.STONE : Material.AIR, _x + x, y, _z + z);
     }
 
     @Override
