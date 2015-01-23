@@ -37,8 +37,8 @@ public class MockBlock implements Block {
      * @param y         The y coordinates.
      * @param z         The z coordinates.
      */
-    public MockBlock(MockWorld world, Material material, int x, int y, int z) {
-        _world = world;
+    public MockBlock(World world, Material material, int x, int y, int z) {
+        _world = (MockWorld)world;
         _material = material;
         _x = x;
         _y = y;
@@ -55,8 +55,8 @@ public class MockBlock implements Block {
      * @param y         The y coordinates.
      * @param z         The z coordinates.
      */
-    public MockBlock(MockWorld world, Material material, byte data, int x, int y, int z) {
-        _world = world;
+    public MockBlock(World world, Material material, byte data, int x, int y, int z) {
+        _world = (MockWorld)world;
         _material = material;
         _data = data;
         _x = x;
