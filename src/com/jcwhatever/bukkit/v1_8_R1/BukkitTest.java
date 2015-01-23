@@ -138,6 +138,17 @@ public class BukkitTest {
      * Kick a player by name.
      *
      * @param playerName  The name of the player to kick.
+     *
+     * @return  True if the player was found and kicked.
+     */
+    public static boolean kick(String playerName) {
+        return getServer().kick(playerName, "test", "kicked.");
+    }
+
+    /**
+     * Kick a player by name.
+     *
+     * @param playerName  The name of the player to kick.
      * @param reason      The reason the player is being kicked.
      * @param message     The message to show the player.
      *
