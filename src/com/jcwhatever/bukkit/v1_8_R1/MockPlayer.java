@@ -28,6 +28,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.EntityEquipment;
@@ -67,12 +69,12 @@ public class MockPlayer implements Player {
     private MockInventoryView _currentView;
     private MockInventory _enderChest = new MockInventory(this, InventoryType.ENDER_CHEST, 3 * 9);
     private GameMode _gameMode = GameMode.SURVIVAL;
-    private Location _location = new Location(BukkitTest.world("world"), 0, 11, 0);
+    private Location _location = new Location(BukkitTester.world("world"), 0, 11, 0);
     private boolean _canPickupItems = true;
     private double _maxHealth = 20;
     private double _health = 20;
     private boolean _isOp;
-    private Location _compassTarget = new Location(BukkitTest.world("world"), 0, 0, 0);
+    private Location _compassTarget = new Location(BukkitTester.world("world"), 0, 0, 0);
 
     /**
      * Constructor.
@@ -185,7 +187,7 @@ public class MockPlayer implements Player {
 
     @Override
     public void setSneaking(boolean b) {
-
+        // PlayerToggleSneakEvent
     }
 
     @Override
@@ -195,7 +197,7 @@ public class MockPlayer implements Player {
 
     @Override
     public void setSprinting(boolean b) {
-
+        // PlayerToggleSprintEvent
     }
 
     @Override
@@ -295,6 +297,8 @@ public class MockPlayer implements Player {
 
     @Override
     public void incrementStatistic(Statistic statistic) throws IllegalArgumentException {
+
+        //PlayerStatisticIncrementEvent event = new PlayerStatisticIncrementEvent()
 
     }
 
@@ -443,14 +447,19 @@ public class MockPlayer implements Player {
 
     }
 
+    private int _level;
+
     @Override
     public int getLevel() {
-        return 0;
+        return _level;
     }
 
     @Override
     public void setLevel(int i) {
 
+        PlayerLevelChangeEvent event = new PlayerLevelChangeEvent(this, _level, i);
+        Bukkit.getPluginManager().callEvent(event);
+        _level = i;
     }
 
     @Override
@@ -791,6 +800,9 @@ public class MockPlayer implements Player {
     @Override
     public void setFlying(boolean b) {
 
+        // PlayerToggleFlightEvent
+
+
     }
 
     @Override
@@ -989,7 +1001,13 @@ public class MockPlayer implements Player {
 
     @Override
     public void setGameMode(GameMode gameMode) {
-        _gameMode = gameMode;
+
+        PlayerGameModeChangeEvent event = new PlayerGameModeChangeEvent(this, gameMode);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled())
+            return;
+
+        _gameMode = event.getNewGameMode();
     }
 
     @Override

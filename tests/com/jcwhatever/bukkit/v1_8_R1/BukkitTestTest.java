@@ -4,26 +4,36 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import com.jcwhatever.bukkit.v1_8_R1.events.BukkitEventTester;
+
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.InventoryType.SlotType;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.server.PluginEnableEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.Plugin;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Tests {@link BukkitTest}
+ * Tests {@link BukkitTester}
  */
 public class BukkitTestTest {
 
     @BeforeClass
     public static void init() {
-        BukkitTest.init();
+        BukkitTester.init();
     }
 
     /**
@@ -40,7 +50,7 @@ public class BukkitTestTest {
     @Test
     public void testGetServer() throws Exception {
 
-        MockServer server = BukkitTest.getServer();
+        MockServer server = BukkitTester.getServer();
 
         assertNotNull(server);
         assertEquals(server, Bukkit.getServer());
@@ -52,16 +62,16 @@ public class BukkitTestTest {
     @Test
     public void testHeartBeat() throws Exception {
 
-        int startTicks = BukkitTest._currentTick;
+        int startTicks = BukkitTester._currentTick;
 
         long end = System.currentTimeMillis() + (10 * 50); // end in 10 ticks
 
         while (System.currentTimeMillis() < end) {
-            BukkitTest.heartBeat();
+            BukkitTester.heartBeat();
         }
 
-        assertTrue(BukkitTest._currentTick > startTicks + 8 &&
-                   BukkitTest._currentTick < startTicks + 12 );
+        assertTrue(BukkitTester._currentTick > startTicks + 8 &&
+                   BukkitTester._currentTick < startTicks + 12 );
     }
 
     /**
@@ -70,11 +80,11 @@ public class BukkitTestTest {
     @Test
     public void testPause() throws Exception {
 
-        int startTicks = BukkitTest._currentTick;
+        int startTicks = BukkitTester._currentTick;
 
-        BukkitTest.pause(10); // pause 10 ticks
+        BukkitTester.pause(10); // pause 10 ticks
 
-        assertEquals(startTicks + 10, BukkitTest._currentTick);
+        assertEquals(startTicks + 10, BukkitTester._currentTick);
     }
 
     /**
@@ -83,11 +93,17 @@ public class BukkitTestTest {
     @Test
     public void testLogin() throws Exception {
 
+        BukkitEventTester.reset(PlayerLoginEvent.class);
+        BukkitEventTester.reset(PlayerJoinEvent.class);
+
         assertEquals(null, Bukkit.getPlayer("playerName"));
 
-        BukkitTest.login("playerName");
+        BukkitTester.login("playerName");
 
         assertNotNull(Bukkit.getPlayer("playerName"));
+
+        assertEquals(1, BukkitEventTester.countEvent(PlayerLoginEvent.class));
+        assertEquals(1, BukkitEventTester.countEvent(PlayerJoinEvent.class));
     }
 
     /**
@@ -96,13 +112,17 @@ public class BukkitTestTest {
     @Test
     public void testLogout() throws Exception {
 
-        BukkitTest.login("playerName");
+        BukkitEventTester.reset(PlayerQuitEvent.class);
+
+        BukkitTester.login("playerName");
 
         assertNotNull(Bukkit.getPlayer("playerName"));
 
-        BukkitTest.logout("playerName");
+        BukkitTester.logout("playerName");
 
         assertEquals(null, Bukkit.getPlayer("playerName"));
+
+        assertEquals(1, BukkitEventTester.countEvent(PlayerQuitEvent.class));
     }
 
     /**
@@ -111,13 +131,19 @@ public class BukkitTestTest {
     @Test
     public void testKick() throws Exception {
 
-        BukkitTest.login("playerName");
+        BukkitEventTester.reset(PlayerQuitEvent.class);
+        BukkitEventTester.reset(PlayerKickEvent.class);
+
+        BukkitTester.login("playerName");
 
         assertNotNull(Bukkit.getPlayer("playerName"));
 
-        BukkitTest.kick("playerName");
+        BukkitTester.kick("playerName");
 
         assertEquals(null, Bukkit.getPlayer("playerName"));
+
+        assertEquals(1, BukkitEventTester.countEvent(PlayerQuitEvent.class));
+        assertEquals(1, BukkitEventTester.countEvent(PlayerKickEvent.class));
     }
 
     /**
@@ -126,13 +152,17 @@ public class BukkitTestTest {
     @Test
     public void testWorld() throws Exception {
 
+        BukkitEventTester.reset(WorldLoadEvent.class);
+
         assertEquals(null, Bukkit.getWorld("testworld"));
 
-        World world = BukkitTest.world("testworld");
+        World world = BukkitTester.world("testworld");
 
         assertTrue(world instanceof MockWorld);
 
         assertEquals(world, Bukkit.getWorld("testworld"));
+
+        BukkitEventTester.countEvent(WorldLoadEvent.class);
     }
 
     /**
@@ -143,7 +173,7 @@ public class BukkitTestTest {
 
         assertEquals(null, Bukkit.getPluginManager().getPlugin("plugin"));
 
-        Plugin plugin = BukkitTest.mockPlugin("plugin");
+        Plugin plugin = BukkitTester.mockPlugin("plugin");
 
         assertTrue(plugin instanceof MockPlugin);
 
@@ -158,7 +188,7 @@ public class BukkitTestTest {
 
         assertEquals(null, Bukkit.getPluginManager().getPlugin("bukkitPlugin"));
 
-        Plugin plugin = BukkitTest.initPlugin("bukkitPlugin", "1.0", MockBukkitPlugin.class);
+        Plugin plugin = BukkitTester.initPlugin("bukkitPlugin", "1.0", MockBukkitPlugin.class);
 
         assertTrue(plugin instanceof MockBukkitPlugin);
 
@@ -171,13 +201,17 @@ public class BukkitTestTest {
     @Test
     public void testEnableMockPlugin() throws Exception {
 
+        BukkitEventTester.reset(PluginEnableEvent.class);
+
         Plugin mockPlugin = new MockPlugin("enableMockPluginTest");
 
         assertEquals(false, mockPlugin.isEnabled());
 
-        BukkitTest.enablePlugin(mockPlugin);
+        BukkitTester.enablePlugin(mockPlugin);
 
         assertEquals(true, mockPlugin.isEnabled());
+
+        assertEquals(1, BukkitEventTester.countEvent(PluginEnableEvent.class));
     }
 
     /**
@@ -186,13 +220,17 @@ public class BukkitTestTest {
     @Test
     public void testEnablePlugin() throws Exception {
 
-        Plugin plugin = BukkitTest.initPlugin("enablePluginTest", "1.0", MockBukkitPlugin.class);
+        BukkitEventTester.reset(PluginEnableEvent.class);
+
+        Plugin plugin = BukkitTester.initPlugin("enablePluginTest", "1.0", MockBukkitPlugin.class);
 
         assertEquals(false, plugin.isEnabled());
 
-        BukkitTest.enablePlugin(plugin);
+        BukkitTester.enablePlugin(plugin);
 
         assertEquals(true, plugin.isEnabled());
+
+        assertEquals(1, BukkitEventTester.countEvent(PluginEnableEvent.class));
     }
 
     /**
@@ -201,13 +239,17 @@ public class BukkitTestTest {
     @Test
     public void testDisableMockPlugin() throws Exception {
 
+        BukkitEventTester.reset(PluginDisableEvent.class);
+
         Plugin plugin = new MockPlugin("disableMockPluginTest");
 
-        BukkitTest.enablePlugin(plugin);
+        BukkitTester.enablePlugin(plugin);
         assertEquals(true, plugin.isEnabled());
 
-        BukkitTest.disablePlugin(plugin);
+        BukkitTester.disablePlugin(plugin);
         assertEquals(false, plugin.isEnabled());
+
+        assertEquals(1, BukkitEventTester.countEvent(PluginDisableEvent.class));
     }
 
     /**
@@ -216,13 +258,17 @@ public class BukkitTestTest {
     @Test
     public void testDisablePlugin() throws Exception {
 
-        Plugin plugin = BukkitTest.initPlugin("disablePluginTest", "1.0", MockBukkitPlugin.class);
+        BukkitEventTester.reset(PluginDisableEvent.class);
 
-        BukkitTest.enablePlugin(plugin);
+        Plugin plugin = BukkitTester.initPlugin("disablePluginTest", "1.0", MockBukkitPlugin.class);
+
+        BukkitTester.enablePlugin(plugin);
         assertEquals(true, plugin.isEnabled());
 
-        BukkitTest.disablePlugin(plugin);
+        BukkitTester.disablePlugin(plugin);
         assertEquals(false, plugin.isEnabled());
+
+        assertEquals(1, BukkitEventTester.countEvent(PluginDisableEvent.class));
     }
 
     /**
@@ -231,10 +277,10 @@ public class BukkitTestTest {
     @Test
     public void testViewClick() throws Exception {
 
-        Player player = BukkitTest.login("viewClick");
+        Player player = BukkitTester.login("viewClick");
 
         try {
-            BukkitTest.viewClick(player, SlotType.CONTAINER, 0, ClickType.LEFT, InventoryAction.PICKUP_ALL);
+            BukkitTester.viewClick(player, SlotType.CONTAINER, 0, ClickType.LEFT, InventoryAction.PICKUP_ALL);
             throw new AssertionError("RuntimeException expected.");
         }
         catch(RuntimeException ignore) {}
@@ -242,6 +288,10 @@ public class BukkitTestTest {
         Inventory inventory = Bukkit.createInventory(player, InventoryType.CHEST);
         player.openInventory(inventory);
 
-        BukkitTest.viewClick(player, SlotType.CONTAINER, 0, ClickType.LEFT, InventoryAction.PICKUP_ALL);
+        BukkitEventTester.reset(InventoryClickEvent.class);
+
+        BukkitTester.viewClick(player, SlotType.CONTAINER, 0, ClickType.LEFT, InventoryAction.PICKUP_ALL);
+
+        assertEquals(1, BukkitEventTester.countEvent(InventoryClickEvent.class));
     }
 }

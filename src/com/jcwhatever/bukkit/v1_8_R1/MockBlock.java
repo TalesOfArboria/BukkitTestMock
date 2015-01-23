@@ -7,7 +7,6 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
@@ -21,11 +20,13 @@ import java.util.List;
  */
 public class MockBlock implements Block {
 
-    private World _world;
-    private Material _material;
-    private int _x;
-    private int _y;
-    private int _z;
+    MockWorld _world;
+    Material _material;
+    Biome _biome = Biome.BEACH;
+    byte _data;
+    int _x;
+    int _y;
+    int _z;
 
     /**
      * Constructor.
@@ -36,7 +37,7 @@ public class MockBlock implements Block {
      * @param y         The y coordinates.
      * @param z         The z coordinates.
      */
-    public MockBlock(World world, Material material, int x, int y, int z) {
+    public MockBlock(MockWorld world, Material material, int x, int y, int z) {
         _world = world;
         _material = material;
         _x = x;
@@ -44,26 +45,75 @@ public class MockBlock implements Block {
         _z = z;
     }
 
+    /**
+     * Constructor.
+     *
+     * @param world     The world the block is in.
+     * @param material  The block material.
+     * @param data      The block data.
+     * @param x         The x coordinates.
+     * @param y         The y coordinates.
+     * @param z         The z coordinates.
+     */
+    public MockBlock(MockWorld world, Material material, byte data, int x, int y, int z) {
+        _world = world;
+        _material = material;
+        _data = data;
+        _x = x;
+        _y = y;
+        _z = z;
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param mockBlock  {@code MockBlock} to copy.
+     */
+    public MockBlock(MockBlock mockBlock) {
+        _world = mockBlock._world;
+        _material = mockBlock._material;
+        _biome = mockBlock._biome;
+        _data = mockBlock._data;
+        _x = mockBlock._x;
+        _y = mockBlock._y;
+        _z = mockBlock._z;
+    }
+
+    /**
+     * Get the default mock block.
+     *
+     * @param world   The world the block is in.
+     * @param chunkX  The X coordinates of the chunk the block is in.
+     * @param chunkZ  The Z coordinates of the chunk the block is in.
+     * @param x       The relative X coordinates.
+     * @param y       The Y coordinates.
+     * @param z       The relative Z coordinates.
+     */
+    public static MockBlock getNewBlock(MockWorld world, int chunkX, int chunkZ, int x, int y, int z) {
+        return new MockBlock(world, y <= 10 ? Material.STONE : Material.AIR, chunkX + x, y, chunkZ + z);
+    }
+
     @Override
     public byte getData() {
-        return 0;
+        return _data;
     }
 
     @Override
-    public Block getRelative(int x, int y, int z) {
-        return new MockBlock(_world, Material.AIR, _x + x, _y + y, _z + z);
+    public MockBlock getRelative(int x, int y, int z) {
+        return _world.getBlockAt(_x + x, _y + y, _z + z);
     }
 
     @Override
-    public Block getRelative(BlockFace blockFace) {
-        return new MockBlock(_world, Material.AIR,
-                _x + blockFace.getModX(), _y + blockFace.getModY(), _z + blockFace.getModZ());
+    public MockBlock getRelative(BlockFace blockFace) {
+        return _world.getBlockAt(_x + blockFace.getModX(), _y + blockFace.getModY(), _z + blockFace.getModZ());
     }
 
     @Override
-    public Block getRelative(BlockFace blockFace, int i) {
-        return new MockBlock(_world, Material.AIR,
-                _x + (blockFace.getModX() * i), _y + (blockFace.getModY() * i), _z + (blockFace.getModZ() * i));
+    public MockBlock getRelative(BlockFace blockFace, int i) {
+        return _world.getBlockAt(
+                _x + (blockFace.getModX() * i),
+                _y + (blockFace.getModY() * i),
+                _z + (blockFace.getModZ() * i));
     }
 
     @Override
@@ -177,18 +227,18 @@ public class MockBlock implements Block {
     }
 
     @Override
-    public BlockState getState() {
-        return null;
+    public MockBlockState getState() {
+        return new MockBlockState(this);
     }
 
     @Override
     public Biome getBiome() {
-        return Biome.BEACH;
+        return _biome;
     }
 
     @Override
     public void setBiome(Biome biome) {
-
+        _biome = biome;
     }
 
     @Override

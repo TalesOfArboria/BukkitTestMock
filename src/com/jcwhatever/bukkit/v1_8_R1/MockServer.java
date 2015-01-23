@@ -4,6 +4,7 @@ import com.avaje.ebean.config.ServerConfig;
 
 import org.bukkit.BanList;
 import org.bukkit.BanList.Type;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
@@ -20,9 +21,12 @@ import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftItemFactory;
 import org.bukkit.craftbukkit.v1_8_R1.scheduler.CraftScheduler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.help.HelpMap;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -51,6 +55,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
 
 /**
  * A mock implementation of {@link org.bukkit.Server}.
@@ -102,8 +107,26 @@ public class MockServer implements Server {
      * player is returned.
      *
      * @param playerName  The name of the player.
+     *
+     * @return Null if the player login was rejected.
      */
+    @Nullable
     public MockPlayer login(String playerName) {
+        return login(playerName, false);
+    }
+
+    /**
+     * Login a mock player and return the {@code MockPlayer}
+     * instance. If the player is already logged in, the current
+     * player is returned.
+     *
+     * @param playerName  The name of the player.
+     * @param forceLogin  True to log the player in even if login event is cancelled.
+     *
+     * @return Null if the player login was rejected.
+     */
+    @Nullable
+    public MockPlayer login(String playerName, boolean forceLogin) {
         MockPlayer player = _playerByName.get(playerName.toLowerCase());
         if (player == null) {
             player = new MockPlayer(playerName);
@@ -114,10 +137,15 @@ public class MockServer implements Server {
                 PlayerLoginEvent event = new PlayerLoginEvent(
                         player, "dummyHost", InetAddress.getLocalHost());
                 _pluginManager.callEvent(event);
+                if (!forceLogin && event.getResult() != Result.ALLOWED)
+                    return null;
 
             } catch (UnknownHostException e) {
                 e.printStackTrace();
             }
+
+            PlayerJoinEvent joinEvent = new PlayerJoinEvent(player, Bukkit.getServer().getMotd());
+            _pluginManager.callEvent(joinEvent);
         }
 
         return player;
@@ -196,6 +224,10 @@ public class MockServer implements Server {
 
         _worldsByName.put(name.toLowerCase(), mockWorld);
         _worldsById.put(mockWorld.getUID(), mockWorld);
+
+        WorldLoadEvent event = new WorldLoadEvent(mockWorld);
+        Bukkit.getPluginManager().callEvent(event);
+
         return mockWorld;
     }
 

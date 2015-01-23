@@ -1,10 +1,13 @@
 package com.jcwhatever.bukkit.v1_8_R1;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.EventExecutor;
@@ -157,6 +160,14 @@ public class MockPluginManager implements PluginManager {
             throw new RuntimeException(e);
         }
 
+        if (isEnabled) {
+            PluginEnableEvent event = new PluginEnableEvent(plugin);
+            Bukkit.getPluginManager().callEvent(event);
+        }
+        else {
+            PluginDisableEvent event = new PluginDisableEvent(plugin);
+            Bukkit.getPluginManager().callEvent(event);
+        }
     }
 
     @Override

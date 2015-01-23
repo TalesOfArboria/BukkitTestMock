@@ -1,6 +1,7 @@
 package com.jcwhatever.bukkit.v1_8_R1;
 
 import org.bukkit.BlockChangeDelegate;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Difficulty;
@@ -33,6 +34,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,8 +50,8 @@ public class MockWorld implements World {
     private final String _name;
     private UUID _uuid;
     private Location _spawnLocation = new Location(this, 0, 0, 0);
-    private Map<String, Chunk> _chunks = new HashMap<>(5);
-    private Map<String, Chunk> _loadedChunks = new HashMap<>(5);
+    private Map<String, MockChunk> _chunks = new HashMap<>(5);
+    private Map<String, MockChunk> _loadedChunks = new HashMap<>(5);
     private long _time;
     private long _fullTime;
     private boolean _hasStorm;
@@ -89,64 +91,64 @@ public class MockWorld implements World {
     }
 
     @Override
-    public Block getBlockAt(int x, int y, int z) {
-        return y > 10
-                ? new MockBlock(this, Material.AIR, x, y, z)
-                : new MockBlock(this, Material.STONE, x, y, z);
+    public MockBlock getBlockAt(int x, int y, int z) {
+        MockChunk chunk = getChunkAt(getChunkCoords(x), getChunkCoords(z));
+        return chunk.getBlock(getRelativeCoord(x), y, getRelativeCoord(z));
     }
 
     @Override
-    public Block getBlockAt(Location location) {
-        Material material = location.getY() > 10
-                ? Material.AIR
-                : Material.STONE;
-
-        return new MockBlock(this, material,
-                location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    public MockBlock getBlockAt(Location location) {
+        return getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     @Override
     public int getBlockTypeIdAt(int x, int y, int z) {
-        return y > 10
-                ? Material.AIR.getId()
-                : Material.STONE.getId();
+        MockBlock block = getBlockAt(x, y, z);
+        return block.getType().getId();
     }
 
     @Override
     public int getBlockTypeIdAt(Location location) {
-        return location.getY() > 10
-                ? Material.AIR.getId()
-                : Material.STONE.getId();
+        return getBlockTypeIdAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     @Override
     public int getHighestBlockYAt(int x, int z) {
-        return 10;
+        MockBlock block = getHighestBlockAt(x, z);
+        if (block == null)
+            return -1;
+
+        return block.getY();
     }
 
     @Override
     public int getHighestBlockYAt(Location location) {
-        return 10;
+        return getHighestBlockYAt(location.getBlockX(), location.getBlockZ());
     }
 
     @Override
-    public Block getHighestBlockAt(int x, int z) {
-        return new MockBlock(this, Material.STONE, x, 10, z);
+    public MockBlock getHighestBlockAt(int x, int z) {
+        MockChunk chunk = getChunkAt(getChunkCoords(x), getChunkCoords(z));
+        x = getRelativeCoord(x);
+        z = getRelativeCoord(z);
+
+        for (int i= 254; i >= 0; i--) {
+            MockBlock block = chunk.getBlock(x, i, z);
+            if (block.getType() != Material.AIR)
+                return block;
+        }
+        return null;
     }
 
     @Override
-    public Block getHighestBlockAt(Location location) {
-        return new MockBlock(this, Material.STONE, location.getBlockX(), 10, location.getBlockZ());
-    }
-
-    private String getCoordKey(int x, int z) {
-        return String.valueOf(x) + '.' + z;
+    public MockBlock getHighestBlockAt(Location location) {
+        return getHighestBlockAt(location.getBlockX(), location.getBlockZ());
     }
 
     @Override
-    public Chunk getChunkAt(int x, int z) {
+    public MockChunk getChunkAt(int x, int z) {
         String key = getCoordKey(x, z);
-        Chunk chunk = _chunks.get(key);
+        MockChunk chunk = _chunks.get(key);
         if (chunk == null) {
             chunk = new MockChunk(this, x, z);
             _chunks.put(key, chunk);
@@ -161,8 +163,8 @@ public class MockWorld implements World {
         if (!this.equals(location.getWorld()))
             throw new AssertionError("Location is not from the same world.");
 
-        int x = (int)Math.floor(location.getX() / 16.0D);
-        int z = (int)Math.floor(location.getZ() / 16.0D);
+        int x = getChunkCoords(location.getX());
+        int z = getChunkCoords(location.getZ());
 
         return getChunkAt(x, z);
     }
@@ -211,7 +213,7 @@ public class MockWorld implements World {
 
     @Override
     public void loadChunk(int x, int z) {
-        Chunk mockChunk = getChunkAt(x, z);
+        MockChunk mockChunk = getChunkAt(x, z);
         _loadedChunks.put(getCoordKey(x, z), mockChunk);
     }
 
@@ -253,6 +255,8 @@ public class MockWorld implements World {
 
     @Override
     public boolean regenerateChunk(int x, int z) {
+        MockChunk mockChunk = new MockChunk(this, x, z);
+        _loadedChunks.put(getCoordKey(x, z), mockChunk);
         return true;
     }
 
@@ -313,32 +317,70 @@ public class MockWorld implements World {
 
     @Override
     public List<Entity> getEntities() {
-        return null;
+        return new ArrayList<>(0);
     }
 
     @Override
     public List<LivingEntity> getLivingEntities() {
-        return null;
+        return new ArrayList<>(0);
     }
 
     @Override
     public <T extends Entity> Collection<T> getEntitiesByClass(Class<T>... classes) {
-        return null;
+
+        Set<T> result = new HashSet<>(10);
+
+        for (Class<T> aClass : classes) {
+            result.addAll(getEntitiesByClass(aClass));
+        }
+
+        return result;
     }
 
     @Override
     public <T extends Entity> Collection<T> getEntitiesByClass(Class<T> aClass) {
-        return null;
+
+        if (Player.class.isAssignableFrom(aClass)) {
+
+            List<Player> players = getPlayers();
+            List<T> result = new ArrayList<>(players.size());
+            for (Player p : players) {
+
+                @SuppressWarnings("unchecked")
+                T t = (T)p;
+
+                result.add(t);
+            }
+
+            return result;
+        }
+
+        return new ArrayList<>(0);
     }
 
     @Override
     public Collection<Entity> getEntitiesByClasses(Class<?>... classes) {
-        return null;
+
+        Set<Entity> result = new HashSet<>(10);
+
+        for (Class<?> aClass : classes) {
+            if (Player.class.isAssignableFrom(aClass)) {
+                result.addAll(getPlayers());
+            }
+        }
+
+        return result;
     }
 
     @Override
     public List<Player> getPlayers() {
-        return null;
+        List<Player> result = new ArrayList<>(10);
+        Collection<? extends Player> players = Bukkit.getServer().getOnlinePlayers();
+        for (Player p : players) {
+            if (this.equals(p.getWorld()))
+                result.add(p);
+        }
+        return result;
     }
 
     @Override
@@ -800,4 +842,17 @@ public class MockWorld implements World {
     public boolean equals(Object obj) {
         return obj instanceof World && ((World) obj).getName().equals(_name);
     }
+
+    private int getChunkCoords(double worldCoord) {
+        return (int)Math.floor(worldCoord / 16.0D);
+    }
+
+    private int getRelativeCoord(double worldCoord) {
+        return (int)worldCoord - getChunkCoords(worldCoord);
+    }
+
+    private String getCoordKey(int x, int z) {
+        return String.valueOf(x) + '.' + z;
+    }
+
 }

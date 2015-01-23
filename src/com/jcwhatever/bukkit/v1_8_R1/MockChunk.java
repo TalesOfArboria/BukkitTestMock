@@ -2,20 +2,23 @@ package com.jcwhatever.bukkit.v1_8_R1;
 
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Mock implementation of a chunk.
  */
 public class MockChunk implements Chunk {
 
-    private World _world;
-    private int _x;
-    private int _z;
+    private final Map<String, MockBlock> _blocks = new HashMap<>(10);
+    private final MockWorld _world;
+    private final int _x;
+    private final int _z;
+
+    private boolean _isLoaded;
 
     /**
      * Constructor.
@@ -24,7 +27,7 @@ public class MockChunk implements Chunk {
      * @param x      The chunk x coordinates.
      * @param z      The chunk z coordinates.
      */
-    public MockChunk(World world, int x, int z) {
+    public MockChunk(MockWorld world, int x, int z) {
         _world = world;
         _x = x;
         _z = z;
@@ -41,13 +44,20 @@ public class MockChunk implements Chunk {
     }
 
     @Override
-    public World getWorld() {
+    public MockWorld getWorld() {
         return _world;
     }
 
     @Override
-    public Block getBlock(int x, int y, int z) {
-        return new MockBlock(_world, y <= 10 ? Material.STONE : Material.AIR, _x + x, y, _z + z);
+    public MockBlock getBlock(int x, int y, int z) {
+
+        MockBlock block = _blocks.get(getBlockKey(x, y, z));
+        if (block == null) {
+            block = MockBlock.getNewBlock(_world, _x, _z, x, y, z);
+            _blocks.put(getBlockKey(x, y, z), block);
+        }
+
+        return  block;
     }
 
     @Override
@@ -72,31 +82,35 @@ public class MockChunk implements Chunk {
 
     @Override
     public boolean isLoaded() {
-        return false;
+        return _isLoaded;
     }
 
     @Override
     public boolean load(boolean b) {
-        return false;
+        return _isLoaded = true;
     }
 
     @Override
     public boolean load() {
-        return false;
+        return _isLoaded = true;
     }
 
     @Override
     public boolean unload(boolean b, boolean b1) {
-        return false;
+        return !(_isLoaded = false);
     }
 
     @Override
     public boolean unload(boolean b) {
-        return false;
+        return !(_isLoaded = false);
     }
 
     @Override
     public boolean unload() {
-        return false;
+        return !(_isLoaded = false);
+    }
+
+    private String getBlockKey(int x, int y, int z) {
+        return String.valueOf(x) + '.' + y + '.' + z;
     }
 }

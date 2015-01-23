@@ -1,11 +1,26 @@
 package com.jcwhatever.bukkit.v1_8_R1;
 
+import com.jcwhatever.bukkit.v1_8_R1.events.BlockListener;
+import com.jcwhatever.bukkit.v1_8_R1.events.EnchantmentListener;
+import com.jcwhatever.bukkit.v1_8_R1.events.EntityListener;
+import com.jcwhatever.bukkit.v1_8_R1.events.HangingListener;
+import com.jcwhatever.bukkit.v1_8_R1.events.InventoryListener;
+import com.jcwhatever.bukkit.v1_8_R1.events.PlayerListener;
+import com.jcwhatever.bukkit.v1_8_R1.events.ServerListener;
+import com.jcwhatever.bukkit.v1_8_R1.events.WorldListener;
+
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_8_R1.scheduler.CraftScheduler;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryType.SlotType;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -22,7 +37,7 @@ import java.util.Map;
 /**
  * Static utilities for testing Bukkit plugins.
  */
-public class BukkitTest {
+public class BukkitTester {
 
     public static final String NMS_TEST_VERSION = "v1_8_R1";
 
@@ -53,6 +68,17 @@ public class BukkitTest {
         catch (UnsupportedOperationException ignore) {
             return false;
         }
+
+        Plugin plugin = mockPlugin("BukkitTestMock");
+
+        _server.getPluginManager().registerEvents(new BlockListener(), plugin);
+        _server.getPluginManager().registerEvents(new EnchantmentListener(), plugin);
+        _server.getPluginManager().registerEvents(new EntityListener(), plugin);
+        _server.getPluginManager().registerEvents(new HangingListener(), plugin);
+        _server.getPluginManager().registerEvents(new InventoryListener(), plugin);
+        _server.getPluginManager().registerEvents(new PlayerListener(), plugin);
+        _server.getPluginManager().registerEvents(new WorldListener(), plugin);
+        _server.getPluginManager().registerEvents(new ServerListener(), plugin);
 
         return true;
     }
@@ -304,5 +330,22 @@ public class BukkitTest {
         mockView.click(type, rawSlotIndex, clickType, action);
 
         pause(1);
+    }
+
+    public static void blockClick(Player player, Action action, Block block, BlockFace blockFace) {
+
+        PlayerInteractEvent event = new PlayerInteractEvent(player, action, player.getItemInHand(), block, blockFace);
+        Bukkit.getPluginManager().callEvent(event);
+    }
+
+    public static boolean blockBreak(Player player, Block block) {
+        BlockBreakEvent event = new BlockBreakEvent(block, player);
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.isCancelled())
+            return false;
+
+        block.getWorld().getBlockAt(block.getX(), block.getY(), block.getZ()).setType(Material.AIR);
+        return true;
     }
 }

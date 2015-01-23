@@ -21,7 +21,7 @@ public class MockPlugin extends JavaPlugin {
      * @param name  The name of the plugin.
      */
     public MockPlugin(String name) {
-        super(new JavaPluginLoader(BukkitTest.getServer()),
+        super(new JavaPluginLoader(BukkitTester.getServer()),
                 generateDescription(name, "v1.0"), new File(""), new File(""));
     }
 
@@ -31,7 +31,7 @@ public class MockPlugin extends JavaPlugin {
      * @return  Self for chaining.
      */
     public MockPlugin enable() {
-        BukkitTest.getServer().getPluginManager().enablePlugin(this);
+        BukkitTester.getServer().getPluginManager().enablePlugin(this);
         return this;
     }
 
@@ -41,7 +41,7 @@ public class MockPlugin extends JavaPlugin {
      * @return  Self for chaining.
      */
     public MockPlugin disable() {
-        BukkitTest.getServer().getPluginManager().disablePlugin(this);
+        BukkitTester.getServer().getPluginManager().disablePlugin(this);
         return this;
     }
 
