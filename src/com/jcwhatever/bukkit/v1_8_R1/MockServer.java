@@ -31,7 +31,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -445,7 +444,7 @@ public class MockServer implements Server {
     }
 
     @Override
-    public PluginManager getPluginManager() {
+    public MockPluginManager getPluginManager() {
         return _pluginManager;
     }
 

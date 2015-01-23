@@ -26,10 +26,10 @@ public class BukkitTest {
 
     public static final String NMS_TEST_VERSION = "v1_8_R1";
 
-    private static boolean _isInit;
-    private static long _nextHeartBeat;
-    private static int _currentTick = 0;
-    private static MockServer _server;
+    static boolean _isInit;
+    static long _nextHeartBeat;
+    static int _currentTick = 0;
+    static MockServer _server;
 
     /**
      * Initialize the Bukkit server. This needs to be called
@@ -189,6 +189,20 @@ public class BukkitTest {
      * <p>The plugin is initialized without commands. The returned
      * instance is not yet enabled.</p>
      *
+     * <p>The plugin requires a constructor with private or greater access
+     * with the following arguments:</p>
+     *
+     * <ul>
+     *     <li>{@link org.bukkit.plugin.java.JavaPluginLoader}</li>
+     *     <li>{@link org.bukkit.plugin.PluginDescriptionFile}</li>
+     *     <li>{@link java.io.File}</li>
+     *     <li>{@link java.io.File}</li>
+     * </ul>
+     *
+     * <p>The arguments passed into the constructor should be forwarded to
+     * the protected superclass {@link org.bukkit.plugin.java.JavaPlugin}
+     * constructor of the same signature.</p>
+     *
      * @param name         The name to initialize the plugin with.
      * @param version      The version to initialize the plugin with.
      * @param pluginClass  The plugin class.
@@ -220,27 +234,28 @@ public class BukkitTest {
         }
 
         T plugin;
+        Constructor<T> constructor;
 
-        // instantiate plugin
+        // get test constructor.
         try {
 
-            Constructor<T> constructor = pluginClass.getDeclaredConstructor(
+            constructor = pluginClass.getDeclaredConstructor(
                     JavaPluginLoader.class, PluginDescriptionFile.class, File.class, File.class);
             constructor.setAccessible(true);
 
+        } catch (NoSuchMethodException e) {
+            throw new AssertionError("Required test constructor not found in plugin. Unable to init for test.");
+        }
+
+        // instantiate plugin.
+        try {
             plugin = constructor.newInstance(new JavaPluginLoader(Bukkit.getServer()),
                     descriptionFile, new File(""), new File(""));
-
-            try {
-                plugin = pluginClass.newInstance();
-            }
-            catch (IllegalStateException ignore) {}
-
-        } catch (InstantiationException | IllegalAccessException |
-                NoSuchMethodException | InvocationTargetException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
 
+        getServer().getPluginManager().registerPlugin(plugin);
         return plugin;
     }
 
@@ -276,12 +291,12 @@ public class BukkitTest {
 
         InventoryView view = player.getOpenInventory();
         if (view == null)
-            throw new AssertionError("Cannot click inventory view because the player " +
+            throw new RuntimeException("Cannot click inventory view because the player " +
                     "does not have an open inventory view.");
 
 
         if (!(view instanceof MockInventoryView))
-            throw new AssertionError("Cannot click inventory view because its not an " +
+            throw new RuntimeException("Cannot click inventory view because its not an " +
                     "instance of MockInventoryView.");
 
         MockInventoryView mockView = (MockInventoryView)view;

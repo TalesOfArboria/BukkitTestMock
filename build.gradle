@@ -33,13 +33,19 @@ def includeFiles = [
 ]
 
 // include test classes
-def testIncludes = null
+def testIncludes = [
+        'com/jcwhatever/bukkit/v1_8_R1/TestAll.class'
+]
 
 // exclude test classes
 def testExcludes = null
 
 // test dependencies
-def testDepends = null
+def testDepends = [
+        'junit:junit:4.+',
+        'org.easetech:easytest-core:1.3.1',
+        'org.spigotmc:unmapped-spigot:1.8-R0.1-SNAPSHOT'
+]
 def testRuntimeDepends = null
 
 // dependencies that should always be downloaded (cached for 30 seconds)
@@ -52,7 +58,7 @@ def sourceDir = 'src'
 def resourceDir = null
 
 // test source directory
-def testSourceDir = null
+def testSourceDir = 'tests'
 
 // test resource directory
 def testResourceDir = null
