@@ -36,6 +36,7 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicesManager;
+import org.bukkit.plugin.SimpleServicesManager;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.ScoreboardManager;
@@ -66,6 +67,7 @@ public class MockServer implements Server {
     private final SimpleCommandMap _commandMap;
     private final MockPluginManager _pluginManager;
     private final CraftScheduler _scheduler = new CraftScheduler();
+    private final SimpleServicesManager _servicesManager = new SimpleServicesManager();
     private final Map<String, MockPlayer> _playerByName = new HashMap<>(5);
     private final Map<UUID, MockPlayer> _playersById = new HashMap<>(5);
     private Map<String, World> _worldsByName = new HashMap<>(5);
@@ -487,7 +489,7 @@ public class MockServer implements Server {
 
     @Override
     public ServicesManager getServicesManager() {
-        return null;
+        return _servicesManager;
     }
 
     @Override
