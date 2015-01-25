@@ -1,4 +1,7 @@
-package com.jcwhatever.bukkit.v1_8_R1;
+package com.jcwhatever.bukkit.v1_8_R1.blocks;
+
+import com.jcwhatever.bukkit.v1_8_R1.MockChunk;
+import com.jcwhatever.bukkit.v1_8_R1.MockWorld;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -28,6 +31,10 @@ public class MockBlock implements Block {
     int _y;
     int _z;
 
+    MockBlockState _currentState;
+
+
+
     /**
      * Constructor.
      *
@@ -38,11 +45,7 @@ public class MockBlock implements Block {
      * @param z         The z coordinates.
      */
     public MockBlock(World world, Material material, int x, int y, int z) {
-        _world = (MockWorld)world;
-        _material = material;
-        _x = x;
-        _y = y;
-        _z = z;
+        this(world, material, (byte)0, x, y, z);
     }
 
     /**
@@ -62,6 +65,7 @@ public class MockBlock implements Block {
         _x = x;
         _y = y;
         _z = z;
+        _currentState = MockBlockState.create(this);
     }
 
     /**
@@ -77,6 +81,7 @@ public class MockBlock implements Block {
         _x = mockBlock._x;
         _y = mockBlock._y;
         _z = mockBlock._z;
+        _currentState = new MockBlockState(mockBlock._currentState);
     }
 
     /**
@@ -142,7 +147,7 @@ public class MockBlock implements Block {
     }
 
     @Override
-    public World getWorld() {
+    public MockWorld getWorld() {
         return _world;
     }
 
@@ -178,17 +183,20 @@ public class MockBlock implements Block {
 
     @Override
     public void setData(byte b) {
-
+        _data = b;
+        _currentState = MockBlockState.create(this);
     }
 
     @Override
     public void setData(byte b, boolean b1) {
-
+        _data = b;
+        _currentState = MockBlockState.create(this);
     }
 
     @Override
     public void setType(Material material) {
         _material = material;
+        _currentState = MockBlockState.create(this);
     }
 
     @Override
@@ -196,6 +204,7 @@ public class MockBlock implements Block {
         Material material = Material.getMaterial(i);
         if (material != null) {
             _material = material;
+            _currentState = MockBlockState.create(this);
             return true;
         }
         return false;
@@ -206,6 +215,7 @@ public class MockBlock implements Block {
         Material material = Material.getMaterial(i);
         if (material != null) {
             _material = material;
+            _currentState = MockBlockState.create(this);
             return true;
         }
         return false;
@@ -216,6 +226,7 @@ public class MockBlock implements Block {
         Material material = Material.getMaterial(i);
         if (material != null) {
             _material = material;
+            _currentState = MockBlockState.create(this);
             return true;
         }
         return false;
@@ -228,7 +239,7 @@ public class MockBlock implements Block {
 
     @Override
     public MockBlockState getState() {
-        return new MockBlockState(this);
+        return MockBlockState.create(this);
     }
 
     @Override

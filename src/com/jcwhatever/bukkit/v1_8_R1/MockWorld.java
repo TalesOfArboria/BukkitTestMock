@@ -1,11 +1,15 @@
 package com.jcwhatever.bukkit.v1_8_R1;
 
+import com.jcwhatever.bukkit.v1_8_R1.blocks.MockBlock;
+import com.jcwhatever.bukkit.v1_8_R1.blocks.MockSign;
+
 import org.bukkit.BlockChangeDelegate;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Difficulty;
 import org.bukkit.Effect;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -14,6 +18,7 @@ import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
@@ -23,6 +28,11 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
@@ -88,6 +98,213 @@ public class MockWorld implements World {
             _uuid = UUID.randomUUID();
             _nameIdMap.put(name, _uuid);
         }
+    }
+
+    /**
+     * Simulate a player breaking a block in the world.
+     *
+     * <p>The {@code PlayerInteractEvent} is fired first. If the block
+     * being broken is not air, the {@code BlockBreakEvent} is fired second.</p>
+     *
+     * @param player  The player.
+     * @param x       The X coordinates of the block.
+     * @param y       The Y coordinates of the block.
+     * @param z       The Z coordinates of the block.
+     *
+     * @return  True if not cancelled by events.
+     */
+    public boolean breakBlockNow(Player player, int x, int y, int z) {
+        return breakBlockNow(player, getBlockAt(x, y, z));
+    }
+
+    /**
+     * Simulate a player breaking a block in the world.
+     *
+     * <p>Acts as if the player is in Creative game mode (event if the
+     * player object is not) and only calls the {@code BlockBreakEvent}.</p>
+     *
+     * @param player  The player.
+     * @param block   The block to break.
+     *
+     * @return  True if not cancelled by events.
+     */
+    public boolean breakBlockNow(Player player, MockBlock block) {
+
+        BlockBreakEvent event = new BlockBreakEvent(block, player);
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.isCancelled())
+            return false;
+
+        MockBlock latest = block.getWorld().getBlockAt(block.getX(), block.getY(), block.getZ());
+
+        latest.setType(Material.AIR);
+        latest.setData((byte)0);
+        return true;
+    }
+
+    /**
+     * Simulate a player breaking a block in the world.
+     *
+     * <p>If the player is in {@code CREATIVE} game mode, the block is
+     * broken immediately. Otherwise the {@code PlayerInteractEvent} is called
+     * first followed by a 10 tick delay before calling the {@code BlockBreakEvent}
+     * and breaking the block</p>
+     *
+     * <p>The 10 tick delay is a thread pause so there is no need to schedule a task
+     * to handle the result. When the method ends the entire event cycle is finished.
+     * The Bukkit scheduler service is still running during the 10 tick pause.</p>
+     *
+     * @param player  The player.
+     * @param x       The X coordinates of the block.
+     * @param y       The Y coordinates of the block.
+     * @param z       The Z coordinates of the block.
+     *
+     * @return  True if not cancelled by events.
+     */
+    public boolean breakBlock(Player player, int x, int y, int z) {
+        return breakBlock(player, getBlockAt(x, y, z));
+    }
+
+    /**
+     * Simulate a player breaking a block in the world.
+     *
+     * <p>If the player is in {@code CREATIVE} game mode, the block is
+     * broken immediately. Otherwise the {@code PlayerInteractEvent} is called
+     * first followed by a 10 tick delay before calling the {@code BlockBreakEvent}
+     * and breaking the block</p>
+     *
+     * <p>The 10 tick delay is a thread pause so there is no need to schedule a task
+     * to handle the result. When the method ends the entire event cycle is finished.
+     * The Bukkit scheduler service is still running during the 10 tick pause.</p>
+     *
+     * @param player  The player.
+     * @param block   The block to break.
+     *
+     * @return  True if not cancelled by events.
+     */
+    public boolean breakBlock(Player player, MockBlock block) {
+
+        if (player.getGameMode() == GameMode.CREATIVE)
+            return breakBlockNow(player, block);
+
+        Action action = block.getType() == Material.AIR
+                ? Action.LEFT_CLICK_BLOCK
+                : Action.RIGHT_CLICK_BLOCK;
+
+        // simulate initial dig
+        PlayerInteractEvent interactEvent = new PlayerInteractEvent(
+                player, action, player.getItemInHand(), block, BlockFace.SOUTH);
+        Bukkit.getPluginManager().callEvent(interactEvent);
+
+        if (interactEvent.isCancelled())
+            return false;
+
+        // simulate time to break the block. (compressed)
+        BukkitTester.pause(10);
+
+        return breakBlockNow(player, block);
+    }
+
+    /**
+     * Change the block at the specified coordinates to a sign post and
+     * fill with the specified lines.
+     *
+     * <p>There must be 4 lines.</p>
+     *
+     * @param player  The player that is placing the sign.
+     * @param x       The X coordinates.
+     * @param y       The Y coordinates.
+     * @param z       The Z coordinates.
+     * @param lines   The lines.
+     */
+    public boolean placeSignPost(Player player, int x, int y, int z, String... lines) {
+        return placeSign(player, Material.SIGN_POST, x, y, z, lines);
+    }
+
+    /**
+     * Change the block at the specified coordinates to a wall sign and
+     * fill with the specified lines.
+     *
+     * <p>There must be 4 lines.</p>
+     *
+     * @param player  The player that is placing the sign.
+     * @param x       The X coordinates.
+     * @param y       The Y coordinates.
+     * @param z       The Z coordinates.
+     * @param lines   The lines.
+     */
+    public boolean placeWallSign(Player player, int x, int y, int z, String... lines) {
+        return placeSign(player, Material.WALL_SIGN, x, y, z, lines);
+    }
+
+    /**
+     * Change the block at the specified coordinates to a sign and
+     * fill with the specified lines.
+     *
+     * <p>There must be 4 lines.</p>
+     *
+     * @param player    The player that is placing the sign.
+     * @param material  The sign type.  Must be {@code WALL_SIGN} or {@code SIGN_POST}.
+     * @param x         The X coordinates.
+     * @param y         The Y coordinates.
+     * @param z         The Z coordinates.
+     * @param lines     The lines.
+     */
+    public boolean placeSign(Player player, Material material, int x, int y, int z, String... lines) {
+
+        assert material == Material.WALL_SIGN || material == Material.SIGN_POST;
+
+        MockBlock block = getBlockAt(x, y, z);
+
+        MockBlock clone = new MockBlock(block);
+        clone.setData((byte)0x2);
+
+        clone.setType(material);
+        MockSign sign = (MockSign)clone.getState();
+        sign.setLine(0, "");
+        sign.setLine(1, "");
+        sign.setLine(2, "");
+        sign.setLine(3, "");
+
+        MockBlock clickedBlock = block.getRelative(BlockFace.SOUTH);
+        player.setItemInHand(new ItemStack(Material.SIGN));
+
+        // call Player interact event
+        PlayerInteractEvent interactEvent = new PlayerInteractEvent(
+                player, Action.RIGHT_CLICK_BLOCK, player.getItemInHand(),
+                clickedBlock, BlockFace.NORTH);
+
+        Bukkit.getPluginManager().callEvent(interactEvent);
+        if (interactEvent.isCancelled())
+            return false;
+
+        // call block place event
+        BlockPlaceEvent placeEvent = new BlockPlaceEvent(block, clone.getState(),
+                clickedBlock, player.getItemInHand(), player, true);
+
+        Bukkit.getPluginManager().callEvent(placeEvent);
+        if (placeEvent.isCancelled())
+            return false;
+
+        // update block state
+        sign.update(true);
+
+        // call sign change event
+        SignChangeEvent signEvent = new SignChangeEvent(block, player, lines);
+
+        Bukkit.getPluginManager().callEvent(signEvent);
+        if (signEvent.isCancelled())
+            return false;
+
+        sign.setLine(0, signEvent.getLine(0));
+        sign.setLine(1, signEvent.getLine(1));
+        sign.setLine(2, signEvent.getLine(2));
+        sign.setLine(3, signEvent.getLine(3));
+
+        sign.update();
+
+        return true;
     }
 
     @Override

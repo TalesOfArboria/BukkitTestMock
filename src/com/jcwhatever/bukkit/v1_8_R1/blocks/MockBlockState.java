@@ -1,4 +1,6 @@
-package com.jcwhatever.bukkit.v1_8_R1;
+package com.jcwhatever.bukkit.v1_8_R1.blocks;
+
+import com.jcwhatever.bukkit.v1_8_R1.MockWorld;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -18,15 +20,27 @@ import java.util.List;
  */
 public class MockBlockState implements BlockState {
 
-    private MockWorld _world;
-    private Material _material;
-    private Biome _biome = Biome.BEACH;
-    private byte _data;
-    private int _x;
-    private int _y;
-    private int _z;
+    public static MockBlockState create(MockBlock block) {
+        switch (block.getType()) {
+            case WALL_SIGN:
+                // fall through
+            case SIGN_POST:
+                return new MockSign(block);
+            default:
+                return new MockBlockState(block);
+        }
+    }
 
-    public MockBlockState(MockBlock mockBlock) {
+    protected MockWorld _world;
+    protected Material _material;
+    protected Biome _biome = Biome.BEACH;
+    protected MaterialData _materialData;
+    protected byte _data;
+    protected final int _x;
+    protected final int _y;
+    protected final int _z;
+
+    protected MockBlockState(MockBlock mockBlock) {
         _world = mockBlock._world;
         _material = mockBlock._material;
         _biome = mockBlock._biome;
@@ -34,6 +48,18 @@ public class MockBlockState implements BlockState {
         _x = mockBlock._x;
         _y = mockBlock._y;
         _z = mockBlock._z;
+        _materialData = _material.getNewData(_data);
+    }
+
+    public MockBlockState(MockBlockState state) {
+        _world = state._world;
+        _material = state._material;
+        _biome = state._biome;
+        _data = state._data;
+        _x = state._x;
+        _y = state._y;
+        _z = state._z;
+        _materialData = state._materialData.clone();
     }
 
     @Override
@@ -43,7 +69,7 @@ public class MockBlockState implements BlockState {
 
     @Override
     public MaterialData getData() {
-        return new MaterialData(_material.getId(), _data);
+        return _materialData;
     }
 
     @Override
@@ -136,6 +162,8 @@ public class MockBlockState implements BlockState {
         block._material = _material;
         block._data = _data;
         block._biome = _biome;
+
+        block._currentState = this;
         return true;
     }
 

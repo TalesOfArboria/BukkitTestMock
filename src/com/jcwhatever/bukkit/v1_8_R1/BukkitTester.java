@@ -10,13 +10,11 @@ import com.jcwhatever.bukkit.v1_8_R1.events.ServerListener;
 import com.jcwhatever.bukkit.v1_8_R1.events.WorldListener;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_8_R1.scheduler.CraftScheduler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryType.SlotType;
@@ -336,16 +334,5 @@ public class BukkitTester {
 
         PlayerInteractEvent event = new PlayerInteractEvent(player, action, player.getItemInHand(), block, blockFace);
         Bukkit.getPluginManager().callEvent(event);
-    }
-
-    public static boolean blockBreak(Player player, Block block) {
-        BlockBreakEvent event = new BlockBreakEvent(block, player);
-        Bukkit.getPluginManager().callEvent(event);
-
-        if (event.isCancelled())
-            return false;
-
-        block.getWorld().getBlockAt(block.getX(), block.getY(), block.getZ()).setType(Material.AIR);
-        return true;
     }
 }

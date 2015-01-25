@@ -1,11 +1,15 @@
 package com.jcwhatever.bukkit.v1_8_R1;
 
+import com.jcwhatever.bukkit.v1_8_R1.blocks.MockBlock;
+
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,12 +66,12 @@ public class MockChunk implements Chunk {
 
     @Override
     public ChunkSnapshot getChunkSnapshot() {
-        return null;
+        return new MockChunkSnapshot(_world, _x, _z, _blocks);
     }
 
     @Override
     public ChunkSnapshot getChunkSnapshot(boolean b, boolean b1, boolean b2) {
-        return null;
+        return new MockChunkSnapshot(_world, _x, _z, _blocks);
     }
 
     @Override
@@ -77,7 +81,19 @@ public class MockChunk implements Chunk {
 
     @Override
     public BlockState[] getTileEntities() {
-        return new BlockState[0];
+
+        List<BlockState> blockStates = new ArrayList<>(10);
+
+        for (MockBlock block : _blocks.values()) {
+            switch (block.getType()) {
+                case WALL_SIGN:
+                case SIGN_POST:
+                    blockStates.add(block.getState());
+                break;
+            }
+        }
+
+        return blockStates.toArray(new BlockState[blockStates.size()]);
     }
 
     @Override
