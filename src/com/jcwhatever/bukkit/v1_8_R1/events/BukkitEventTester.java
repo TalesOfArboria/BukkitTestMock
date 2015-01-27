@@ -26,7 +26,7 @@ public class BukkitEventTester {
      * Invoked from within an event handler to notify
      * that an event has been called.
      *
-     * <p>The result returned indicates weather the event should
+     * <p>The result returned indicates whether the event should
      * be cancelled, if possible.</p>
      *
      * @param event  The event that was called.
@@ -80,7 +80,7 @@ public class BukkitEventTester {
     }
 
     /**
-     * Cancel the next called to the specified event.
+     * Cancel the next call to the specified event.
      *
      * @param eventClass  The event class.
      */

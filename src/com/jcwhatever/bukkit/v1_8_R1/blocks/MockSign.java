@@ -4,7 +4,7 @@ import org.bukkit.block.Sign;
 
 /**
  * Mock implementation of a {@link org.bukkit.block.BlockState} that
- * extends {@link org.bukkit.block.Sign} .
+ * is extended by {@link org.bukkit.block.Sign} .
  */
 public class MockSign extends MockBlockState implements Sign {
 
