@@ -68,7 +68,7 @@ ext.jcBuildSettings = [
         testResourceDir : null,
 
 // git repo url (without https://)
-        gitUrl : 'github.com/JCThePants/NucleusFramework.git'
+        gitUrl : 'github.com/JCThePants/BukkitTestMock.git'
 ]
 
 apply from : 'https://github.com/JCThePants/mvn-repo/raw/master/jcbuild.java.gradle.plugin'
