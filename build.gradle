@@ -65,8 +65,12 @@ ext.jcBuildSettings = [
         testSourceDir : 'tests',
 
 // test resource directory
-        testResourceDir : null
+        testResourceDir : null,
+
+// git repo url (without https://)
+        gitUrl : 'github.com/JCThePants/NucleusFramework.git'
 ]
 
 apply from : 'https://github.com/JCThePants/mvn-repo/raw/master/jcbuild.java.gradle.plugin'
 apply from : 'https://github.com/JCThePants/mvn-repo/raw/master/jcmaven.gradle.plugin'
+apply from : 'https://github.com/JCThePants/mvn-repo/raw/master/doxygen.gradle.plugin'
