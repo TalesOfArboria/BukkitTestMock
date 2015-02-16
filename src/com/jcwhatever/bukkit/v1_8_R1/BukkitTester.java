@@ -125,7 +125,7 @@ public class BukkitTester {
 
 
     /**
-     * Login a mock player and return the {@code MockPlayer}
+     * Login a mock player and return the {@link MockPlayer}
      * instance. If the player is already logged in, the current
      * player is returned.
      *
@@ -201,7 +201,7 @@ public class BukkitTester {
      *
      * @param name  The name of the plugin.
      *
-     * @return  The {@code MockPlugin} instance.
+     * @return  The {@link MockPlugin} instance.
      */
     public static MockPlugin mockPlugin(String name) {
         return new MockPlugin(name).enable();

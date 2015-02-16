@@ -71,7 +71,7 @@ public class MockBlock implements Block {
     /**
      * Constructor.
      *
-     * @param mockBlock  {@code MockBlock} to copy.
+     * @param mockBlock  {@link MockBlock} to copy.
      */
     public MockBlock(MockBlock mockBlock) {
         _world = mockBlock._world;

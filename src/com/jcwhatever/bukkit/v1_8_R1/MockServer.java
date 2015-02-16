@@ -104,7 +104,7 @@ public class MockServer implements Server {
     }
 
     /**
-     * Login a mock player and return the {@code MockPlayer}
+     * Login a mock player and return the {@link MockPlayer}
      * instance. If the player is already logged in, the current
      * player is returned.
      *
@@ -118,7 +118,7 @@ public class MockServer implements Server {
     }
 
     /**
-     * Login a mock player and return the {@code MockPlayer}
+     * Login a mock player and return the {@link MockPlayer}
      * instance. If the player is already logged in, the current
      * player is returned.
      *

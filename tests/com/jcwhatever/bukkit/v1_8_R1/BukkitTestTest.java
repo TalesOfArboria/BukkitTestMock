@@ -37,7 +37,7 @@ public class BukkitTestTest {
     }
 
     /**
-     * Make sure {@code #init} is working correctly.
+     * Make sure {@link #init} is working correctly.
      */
     @Test
     public void testInit() throws Exception {
@@ -45,7 +45,7 @@ public class BukkitTestTest {
     }
 
     /**
-     * Make sure {@code #getServer} returns the correct value.
+     * Make sure {@link #getServer} returns the correct value.
      */
     @Test
     public void testGetServer() throws Exception {
@@ -57,7 +57,7 @@ public class BukkitTestTest {
     }
 
     /**
-     * Make sure {@code #heartBear} works correctly.
+     * Make sure {@link #heartBear} works correctly.
      */
     @Test
     public void testHeartBeat() throws Exception {
@@ -75,7 +75,7 @@ public class BukkitTestTest {
     }
 
     /**
-     * Make sure {@code #pause} works correctly.
+     * Make sure {@link #pause} works correctly.
      */
     @Test
     public void testPause() throws Exception {
@@ -88,7 +88,7 @@ public class BukkitTestTest {
     }
 
     /**
-     * Make sure {@code #login} works correctly.
+     * Make sure {@link #login} works correctly.
      */
     @Test
     public void testLogin() throws Exception {
@@ -107,7 +107,7 @@ public class BukkitTestTest {
     }
 
     /**
-     * Make sure {@code #logout} works correctly.
+     * Make sure {@link #logout} works correctly.
      */
     @Test
     public void testLogout() throws Exception {
@@ -126,7 +126,7 @@ public class BukkitTestTest {
     }
 
     /**
-     * Make sure {@code #kick} works correctly.
+     * Make sure {@link #kick} works correctly.
      */
     @Test
     public void testKick() throws Exception {
@@ -147,7 +147,7 @@ public class BukkitTestTest {
     }
 
     /**
-     * Make sure {@code #world} works correctly.
+     * Make sure {@link #world} works correctly.
      */
     @Test
     public void testWorld() throws Exception {
@@ -166,7 +166,7 @@ public class BukkitTestTest {
     }
 
     /**
-     * Make sure {@code #mockPlugin} works correctly.
+     * Make sure {@link #mockPlugin} works correctly.
      */
     @Test
     public void testMockPlugin() throws Exception {
@@ -181,7 +181,7 @@ public class BukkitTestTest {
     }
 
     /**
-     * Make sure {@code #initPlugin} works correctly.
+     * Make sure {@link #initPlugin} works correctly.
      */
     @Test
     public void testInitPlugin() throws Exception {
@@ -196,7 +196,7 @@ public class BukkitTestTest {
     }
 
     /**
-     * Make sure {@code #enablePlugin} works correctly on mock plugins.
+     * Make sure {@link #enablePlugin} works correctly on mock plugins.
      */
     @Test
     public void testEnableMockPlugin() throws Exception {
@@ -215,7 +215,7 @@ public class BukkitTestTest {
     }
 
     /**
-     * Make sure {@code #enablePlugin} works correctly on plugins.
+     * Make sure {@link #enablePlugin} works correctly on plugins.
      */
     @Test
     public void testEnablePlugin() throws Exception {
@@ -234,7 +234,7 @@ public class BukkitTestTest {
     }
 
     /**
-     * Make sure {@code #disablePlugin} works correctly on mock plugins.
+     * Make sure {@link #disablePlugin} works correctly on mock plugins.
      */
     @Test
     public void testDisableMockPlugin() throws Exception {
@@ -253,7 +253,7 @@ public class BukkitTestTest {
     }
 
     /**
-     * Make sure {@code #disablePlugin} works correctly on plugins.
+     * Make sure {@link #disablePlugin} works correctly on plugins.
      */
     @Test
     public void testDisablePlugin() throws Exception {
@@ -272,7 +272,7 @@ public class BukkitTestTest {
     }
 
     /**
-     * Make sure {@code #viewClick} works correctly.
+     * Make sure {@link #viewClick} works correctly.
      */
     @Test
     public void testViewClick() throws Exception {

@@ -103,8 +103,8 @@ public class MockWorld implements World {
     /**
      * Simulate a player breaking a block in the world.
      *
-     * <p>The {@code PlayerInteractEvent} is fired first. If the block
-     * being broken is not air, the {@code BlockBreakEvent} is fired second.</p>
+     * <p>The {@link org.bukkit.event.player.PlayerInteractEvent} is fired first. If the block
+     * being broken is not air, the {@link org.bukkit.event.block.BlockBreakEvent} is fired second.</p>
      *
      * @param player  The player.
      * @param x       The X coordinates of the block.
@@ -121,7 +121,7 @@ public class MockWorld implements World {
      * Simulate a player breaking a block in the world.
      *
      * <p>Acts as if the player is in Creative game mode (event if the
-     * player object is not) and only calls the {@code BlockBreakEvent}.</p>
+     * player object is not) and only calls the {@link org.bukkit.event.block.BlockBreakEvent}.</p>
      *
      * @param player  The player.
      * @param block   The block to break.
@@ -146,9 +146,9 @@ public class MockWorld implements World {
     /**
      * Simulate a player breaking a block in the world.
      *
-     * <p>If the player is in {@code CREATIVE} game mode, the block is
-     * broken immediately. Otherwise the {@code PlayerInteractEvent} is called
-     * first followed by a 10 tick delay before calling the {@code BlockBreakEvent}
+     * <p>If the player is in {@link org.bukkit.GameMode#CREATIVE} game mode, the block is
+     * broken immediately. Otherwise the {@link org.bukkit.event.player.PlayerInteractEvent} is called
+     * first followed by a 10 tick delay before calling the {@link org.bukkit.event.block.BlockBreakEvent}
      * and breaking the block</p>
      *
      * <p>The 10 tick delay is a thread pause so there is no need to schedule a task
@@ -169,9 +169,9 @@ public class MockWorld implements World {
     /**
      * Simulate a player breaking a block in the world.
      *
-     * <p>If the player is in {@code CREATIVE} game mode, the block is
-     * broken immediately. Otherwise the {@code PlayerInteractEvent} is called
-     * first followed by a 10 tick delay before calling the {@code BlockBreakEvent}
+     * <p>If the player is in {@link org.bukkit.GameMode#CREATIVE} game mode, the block is
+     * broken immediately. Otherwise the {@link org.bukkit.event.player.PlayerInteractEvent} is called
+     * first followed by a 10 tick delay before calling the {@link org.bukkit.event.block.BlockBreakEvent}
      * and breaking the block</p>
      *
      * <p>The 10 tick delay is a thread pause so there is no need to schedule a task
@@ -245,7 +245,8 @@ public class MockWorld implements World {
      * <p>There must be 4 lines.</p>
      *
      * @param player    The player that is placing the sign.
-     * @param material  The sign type.  Must be {@code WALL_SIGN} or {@code SIGN_POST}.
+     * @param material  The sign type.  Must be {@link org.bukkit.Material#WALL_SIGN} or
+     *                  {@link org.bukkit.Material#SIGN_POST}.
      * @param x         The X coordinates.
      * @param y         The Y coordinates.
      * @param z         The Z coordinates.
