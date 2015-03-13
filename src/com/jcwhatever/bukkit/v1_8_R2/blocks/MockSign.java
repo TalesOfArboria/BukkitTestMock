@@ -1,4 +1,4 @@
-package com.jcwhatever.bukkit.v1_8_R1.blocks;
+package com.jcwhatever.bukkit.v1_8_R2.blocks;
 
 import org.bukkit.block.Sign;
 

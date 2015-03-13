@@ -1,4 +1,4 @@
-package com.jcwhatever.bukkit.v1_8_R1;
+package com.jcwhatever.bukkit.v1_8_R2;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Server;

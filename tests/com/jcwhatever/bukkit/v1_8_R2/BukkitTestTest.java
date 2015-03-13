@@ -1,10 +1,10 @@
-package com.jcwhatever.bukkit.v1_8_R1;
+package com.jcwhatever.bukkit.v1_8_R2;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import com.jcwhatever.bukkit.v1_8_R1.events.BukkitEventTester;
+import com.jcwhatever.bukkit.v1_8_R2.events.BukkitEventTester;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;

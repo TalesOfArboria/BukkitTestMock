@@ -1,7 +1,7 @@
-package com.jcwhatever.bukkit.v1_8_R1;
+package com.jcwhatever.bukkit.v1_8_R2;
 
-import com.jcwhatever.bukkit.v1_8_R1.blocks.MockBlock;
-import com.jcwhatever.bukkit.v1_8_R1.blocks.MockSign;
+import com.jcwhatever.bukkit.v1_8_R2.blocks.MockBlock;
+import com.jcwhatever.bukkit.v1_8_R2.blocks.MockSign;
 
 import org.bukkit.BlockChangeDelegate;
 import org.bukkit.Bukkit;

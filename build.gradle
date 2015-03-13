@@ -3,8 +3,8 @@
  */
 ext.jcBuildSettings = [
         projectName : 'BukkitTestMock',
-        majorVersion : '0',
-        minorVersion : '0',
+        majorVersion : '1',
+        minorVersion : '8.R2-SNAPSHOT',
         buildBy : null, // auto filled
         buildNumber : null, // auto filled when using teamcity
         mainClass : null,
@@ -23,7 +23,7 @@ ext.jcBuildSettings = [
 // provided dependencies (provided by the runtime environment)
         providedDependsFiles : null,
         providedDepends : [
-                'org.spigotmc:unmapped-spigot:1.8-R0.1-SNAPSHOT',
+                'org.spigotmc:remapped-spigot:1.8.3-R0.1',
         ],
 
 // compile dependencies (compiled into output jar)
@@ -38,7 +38,7 @@ ext.jcBuildSettings = [
 
 // include test classes
         testIncludes : [
-                'com/jcwhatever/bukkit/v1_8_R1/TestAll.class'
+                'com/jcwhatever/bukkit/v1_8_R2/TestAll.class'
         ],
 
 // exclude test classes
@@ -48,7 +48,7 @@ ext.jcBuildSettings = [
         testDepends : [
                 'junit:junit:4.+',
                 'org.easetech:easytest-core:1.3.1',
-                'org.spigotmc:unmapped-spigot:1.8-R0.1-SNAPSHOT'
+                'org.spigotmc:remapped-spigot:1.8.3-R0.1-SNAPSHOT'
         ],
         testRuntimeDepends : null,
 

@@ -1,6 +1,6 @@
-package com.jcwhatever.bukkit.v1_8_R1;
+package com.jcwhatever.bukkit.v1_8_R2;
 
-import com.jcwhatever.bukkit.v1_8_R1.blocks.MockBlock;
+import com.jcwhatever.bukkit.v1_8_R2.blocks.MockBlock;
 
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.block.Biome;

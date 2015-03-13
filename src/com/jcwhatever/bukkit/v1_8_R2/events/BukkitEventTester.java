@@ -1,4 +1,4 @@
-package com.jcwhatever.bukkit.v1_8_R1.events;
+package com.jcwhatever.bukkit.v1_8_R2.events;
 
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;

@@ -1,13 +1,13 @@
-package com.jcwhatever.bukkit.v1_8_R1;
+package com.jcwhatever.bukkit.v1_8_R2;
 
-import com.jcwhatever.bukkit.v1_8_R1.events.BlockListener;
-import com.jcwhatever.bukkit.v1_8_R1.events.EnchantmentListener;
-import com.jcwhatever.bukkit.v1_8_R1.events.EntityListener;
-import com.jcwhatever.bukkit.v1_8_R1.events.HangingListener;
-import com.jcwhatever.bukkit.v1_8_R1.events.InventoryListener;
-import com.jcwhatever.bukkit.v1_8_R1.events.PlayerListener;
-import com.jcwhatever.bukkit.v1_8_R1.events.ServerListener;
-import com.jcwhatever.bukkit.v1_8_R1.events.WorldListener;
+import com.jcwhatever.bukkit.v1_8_R2.events.BlockListener;
+import com.jcwhatever.bukkit.v1_8_R2.events.EnchantmentListener;
+import com.jcwhatever.bukkit.v1_8_R2.events.EntityListener;
+import com.jcwhatever.bukkit.v1_8_R2.events.HangingListener;
+import com.jcwhatever.bukkit.v1_8_R2.events.InventoryListener;
+import com.jcwhatever.bukkit.v1_8_R2.events.PlayerListener;
+import com.jcwhatever.bukkit.v1_8_R2.events.ServerListener;
+import com.jcwhatever.bukkit.v1_8_R2.events.WorldListener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
@@ -37,7 +37,7 @@ import java.util.Map;
  */
 public class BukkitTester {
 
-    public static final String NMS_TEST_VERSION = "v1_8_R1";
+    public static final String NMS_TEST_VERSION = "v1_8_R2";
 
     static boolean _isInit;
     static long _nextHeartBeat;
