@@ -1041,12 +1041,27 @@ public class MockPlayer implements Player {
     }
 
     @Override
+    public List<Block> getLineOfSight(Set<Material> set, int i) {
+        return null;
+    }
+
+    @Override
     public Block getTargetBlock(HashSet<Byte> hashSet, int i) {
         return null;
     }
 
     @Override
+    public Block getTargetBlock(Set<Material> set, int i) {
+        return null;
+    }
+
+    @Override
     public List<Block> getLastTwoTargetBlocks(HashSet<Byte> hashSet, int i) {
+        return null;
+    }
+
+    @Override
+    public List<Block> getLastTwoTargetBlocks(Set<Material> set, int i) {
         return null;
     }
 
@@ -1101,17 +1116,7 @@ public class MockPlayer implements Player {
     }
 
     @Override
-    public int _INVALID_getLastDamage() {
-        return 0;
-    }
-
-    @Override
     public void setLastDamage(double v) {
-
-    }
-
-    @Override
-    public void _INVALID_setLastDamage(int i) {
 
     }
 
@@ -1211,18 +1216,8 @@ public class MockPlayer implements Player {
     }
 
     @Override
-    public void _INVALID_damage(int i) {
-        _health -= i;
-    }
-
-    @Override
     public void damage(double v, Entity entity) {
         _health -= v;
-    }
-
-    @Override
-    public void _INVALID_damage(int i, Entity entity) {
-        _health -= i;
     }
 
     @Override
@@ -1231,18 +1226,8 @@ public class MockPlayer implements Player {
     }
 
     @Override
-    public int _INVALID_getHealth() {
-        return (int)_health;
-    }
-
-    @Override
     public void setHealth(double v) {
         _health = v;
-    }
-
-    @Override
-    public void _INVALID_setHealth(int i) {
-        _health = i;
     }
 
     @Override
@@ -1251,18 +1236,8 @@ public class MockPlayer implements Player {
     }
 
     @Override
-    public int _INVALID_getMaxHealth() {
-        return (int)_maxHealth;
-    }
-
-    @Override
     public void setMaxHealth(double v) {
         _maxHealth = v;
-    }
-
-    @Override
-    public void _INVALID_setMaxHealth(int i) {
-        _maxHealth = i;
     }
 
     @Override

@@ -17,8 +17,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftItemFactory;
-import org.bukkit.craftbukkit.v1_8_R1.scheduler.CraftScheduler;
+import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftItemFactory;
+import org.bukkit.craftbukkit.v1_8_R2.scheduler.CraftScheduler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -246,11 +246,6 @@ public class MockServer implements Server {
     @Override
     public String getBukkitVersion() {
         return "v8_1_R1";
-    }
-
-    @Override
-    public Player[] _INVALID_getOnlinePlayers() {
-        return new Player[0];
     }
 
     @Override

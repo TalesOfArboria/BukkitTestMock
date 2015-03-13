@@ -12,7 +12,7 @@ import com.jcwhatever.bukkit.v1_8_R2.events.WorldListener;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_8_R1.scheduler.CraftScheduler;
+import org.bukkit.craftbukkit.v1_8_R2.scheduler.CraftScheduler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.ClickType;

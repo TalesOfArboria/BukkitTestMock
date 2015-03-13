@@ -200,6 +200,11 @@ public class MockBlock implements Block {
     }
 
     @Override
+    public void setType(Material material, boolean b) {
+        setType(material);
+    }
+
+    @Override
     public boolean setTypeId(int i) {
         Material material = Material.getMaterial(i);
         if (material != null) {

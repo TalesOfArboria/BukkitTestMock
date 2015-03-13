@@ -15,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.TreeType;
 import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.WorldType;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
@@ -1018,6 +1019,11 @@ public class MockWorld implements World {
 
     @Override
     public Spigot spigot() {
+        return null;
+    }
+
+    @Override
+    public WorldBorder getWorldBorder() {
         return null;
     }
 

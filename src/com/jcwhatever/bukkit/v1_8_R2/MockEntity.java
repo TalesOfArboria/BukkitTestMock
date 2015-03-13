@@ -10,11 +10,15 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -137,8 +141,23 @@ public class MockEntity implements Entity {
     }
 
     @Override
+    public void sendMessage(String s) {
+
+    }
+
+    @Override
+    public void sendMessage(String[] strings) {
+
+    }
+
+    @Override
     public Server getServer() {
         return Bukkit.getServer();
+    }
+
+    @Override
+    public String getName() {
+        return null;
     }
 
     @Override
@@ -270,6 +289,71 @@ public class MockEntity implements Entity {
 
     @Override
     public void removeMetadata(String s, Plugin plugin) {
+
+    }
+
+    @Override
+    public boolean isPermissionSet(String s) {
+        return false;
+    }
+
+    @Override
+    public boolean isPermissionSet(Permission permission) {
+        return false;
+    }
+
+    @Override
+    public boolean hasPermission(String s) {
+        return false;
+    }
+
+    @Override
+    public boolean hasPermission(Permission permission) {
+        return false;
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin plugin, String s, boolean b) {
+        return null;
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin plugin) {
+        return null;
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin plugin, String s, boolean b, int i) {
+        return null;
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin plugin, int i) {
+        return null;
+    }
+
+    @Override
+    public void removeAttachment(PermissionAttachment permissionAttachment) {
+
+    }
+
+    @Override
+    public void recalculatePermissions() {
+
+    }
+
+    @Override
+    public Set<PermissionAttachmentInfo> getEffectivePermissions() {
+        return null;
+    }
+
+    @Override
+    public boolean isOp() {
+        return false;
+    }
+
+    @Override
+    public void setOp(boolean b) {
 
     }
 }
