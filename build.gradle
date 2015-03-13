@@ -4,7 +4,7 @@
 ext.jcBuildSettings = [
         projectName : 'BukkitTestMock',
         majorVersion : '1',
-        minorVersion : '8.R2-SNAPSHOT',
+        minorVersion : '8.R2',
         buildBy : null, // auto filled
         buildNumber : null, // auto filled when using teamcity
         mainClass : null,
