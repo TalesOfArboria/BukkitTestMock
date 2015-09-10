@@ -1,18 +1,18 @@
-package com.jcwhatever.v1_8_R2;
+package com.jcwhatever.v1_8_R3;
 
-import com.jcwhatever.v1_8_R2.events.BlockListener;
-import com.jcwhatever.v1_8_R2.events.EnchantmentListener;
-import com.jcwhatever.v1_8_R2.events.EntityListener;
-import com.jcwhatever.v1_8_R2.events.HangingListener;
-import com.jcwhatever.v1_8_R2.events.InventoryListener;
-import com.jcwhatever.v1_8_R2.events.PlayerListener;
-import com.jcwhatever.v1_8_R2.events.ServerListener;
-import com.jcwhatever.v1_8_R2.events.WorldListener;
+import com.jcwhatever.v1_8_R3.events.BlockListener;
+import com.jcwhatever.v1_8_R3.events.EnchantmentListener;
+import com.jcwhatever.v1_8_R3.events.EntityListener;
+import com.jcwhatever.v1_8_R3.events.HangingListener;
+import com.jcwhatever.v1_8_R3.events.InventoryListener;
+import com.jcwhatever.v1_8_R3.events.PlayerListener;
+import com.jcwhatever.v1_8_R3.events.ServerListener;
+import com.jcwhatever.v1_8_R3.events.WorldListener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_8_R2.scheduler.CraftScheduler;
+import org.bukkit.craftbukkit.v1_8_R3.scheduler.CraftScheduler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.ClickType;
@@ -37,7 +37,7 @@ import java.util.Map;
  */
 public class BukkitTester {
 
-    public static final String NMS_TEST_VERSION = "v1_8_R2";
+    public static final String NMS_TEST_VERSION = "v1_8_R3";
 
     static boolean _isInit;
     static long _nextHeartBeat;

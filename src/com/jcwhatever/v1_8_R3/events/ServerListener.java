@@ -1,4 +1,4 @@
-package com.jcwhatever.v1_8_R2.events;
+package com.jcwhatever.v1_8_R3.events;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

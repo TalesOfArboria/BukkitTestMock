@@ -1,7 +1,7 @@
-package com.jcwhatever.v1_8_R2;
+package com.jcwhatever.v1_8_R3;
 
-import com.jcwhatever.v1_8_R2.blocks.MockBlock;
-import com.jcwhatever.v1_8_R2.blocks.MockSign;
+import com.jcwhatever.v1_8_R3.blocks.MockBlock;
+import com.jcwhatever.v1_8_R3.blocks.MockSign;
 
 import org.bukkit.BlockChangeDelegate;
 import org.bukkit.Bukkit;
@@ -600,6 +600,11 @@ public class MockWorld implements World {
                 result.add(p);
         }
         return result;
+    }
+
+    @Override
+    public Collection<Entity> getNearbyEntities(Location location, double v, double v1, double v2) {
+        return new ArrayList<>(0);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.jcwhatever.v1_8_R2;
+package com.jcwhatever.v1_8_R3;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;

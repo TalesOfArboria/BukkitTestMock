@@ -1,6 +1,6 @@
-package com.jcwhatever.v1_8_R2;
+package com.jcwhatever.v1_8_R3;
 
-import com.jcwhatever.v1_8_R2.blocks.MockBlock;
+import com.jcwhatever.v1_8_R3.blocks.MockBlock;
 
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;

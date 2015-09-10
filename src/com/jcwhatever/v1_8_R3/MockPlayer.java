@@ -1,4 +1,4 @@
-package com.jcwhatever.v1_8_R2;
+package com.jcwhatever.v1_8_R3;
 
 import org.bukkit.Achievement;
 import org.bukkit.Bukkit;
@@ -863,6 +863,26 @@ public class MockPlayer implements Player {
     @Override
     public double getHealthScale() {
         return 0;
+    }
+
+    @Override
+    public Entity getSpectatorTarget() {
+        return null;
+    }
+
+    @Override
+    public void setSpectatorTarget(Entity entity) {
+
+    }
+
+    @Override
+    public void sendTitle(String s, String s1) {
+
+    }
+
+    @Override
+    public void resetTitle() {
+
     }
 
     @Override

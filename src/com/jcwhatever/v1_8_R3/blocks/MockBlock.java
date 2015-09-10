@@ -1,7 +1,7 @@
-package com.jcwhatever.v1_8_R2.blocks;
+package com.jcwhatever.v1_8_R3.blocks;
 
-import com.jcwhatever.v1_8_R2.MockChunk;
-import com.jcwhatever.v1_8_R2.MockWorld;
+import com.jcwhatever.v1_8_R3.MockChunk;
+import com.jcwhatever.v1_8_R3.MockWorld;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;

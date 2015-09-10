@@ -1,7 +1,6 @@
-package com.jcwhatever.v1_8_R2;
+package com.jcwhatever.v1_8_R3;
 
 import com.avaje.ebean.config.ServerConfig;
-
 import org.bukkit.BanList;
 import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
@@ -17,8 +16,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftItemFactory;
-import org.bukkit.craftbukkit.v1_8_R2.scheduler.CraftScheduler;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemFactory;
+import org.bukkit.craftbukkit.v1_8_R3.scheduler.CraftScheduler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -42,6 +41,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.util.CachedServerIcon;
 
+import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.InetAddress;
@@ -56,7 +56,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
-import javax.annotation.Nullable;
 
 /**
  * A mock implementation of {@link org.bukkit.Server}.
