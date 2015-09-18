@@ -132,7 +132,7 @@ public class BukkitTester {
      * @param playerName  The name of the player.
      */
     public static MockPlayer login(String playerName) {
-        return getServer().login(playerName);
+        return getServer().login(playerName, true);
     }
 
     /**
